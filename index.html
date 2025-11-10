@@ -320,6 +320,12 @@
         .speaker-icon:hover {
             background: #764ba2;
         }
+
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
     </style>
 </head>
 <body>
@@ -419,18 +425,20 @@
             <ul>
                 <li><strong>Pick a Room:</strong> Choose a room with fewer players</li>
                 <li><strong>Move:</strong> Use your mouse to control your cell</li>
-                <li><strong>Grow:</strong> Eat smaller cells and food pellets</li>
+                <li><strong>Grow:</strong> Eat smaller cells and food pellets (smaller=faster, bigger=slower)</li>
                 <li><strong>Quiz Questions:</strong> 📜 Answer Mesopotamia questions every 40 seconds (+10 mass correct, -10 mass wrong)</li>
                 <li><strong>Safe Zones:</strong> 🛡️ Green corners protect you for 15 seconds</li>
-                <li><strong>Split:</strong> Press SPACE to split your cell (when big enough)</li>
-                <li><strong>Goal:</strong> Become the biggest cell AND show your knowledge!</li>
+                <li><strong>💰 NEW - BANKING:</strong> Press SPACE to bank half your mass into permanent score (keeps even if eaten!)</li>
+                <li><strong>Goal:</strong> Build the highest TOTAL SCORE (current mass + banked points)!</li>
             </ul>
         </div>
     </div>
 
     <div id="stats" class="hidden">
         <h3>📊 Your Stats</h3>
-        <div class="stat-item">Mass: <strong id="playerMass">10</strong></div>
+        <div class="stat-item">Current Mass: <strong id="playerMass">10</strong></div>
+        <div class="stat-item">Banked: <strong style="color: #FFD700;" id="bankedScore">0</strong> 💰</div>
+        <div class="stat-item">Total Score: <strong style="color: #4CAF50;" id="totalScore">10</strong></div>
         <div class="stat-item">Rank: <strong id="playerRank">-</strong></div>
         <div class="stat-item">Players: <strong id="playerCount">1</strong></div>
     </div>
@@ -974,12 +982,13 @@
             WORLD_WIDTH: 3000,
             WORLD_HEIGHT: 3000,
             INITIAL_MASS: 10,
+            MAX_MASS: 300,  // NEW: Maximum cell size to keep game playable
             FOOD_MASS: 1,
             MAX_FOOD: 300,
             FOOD_SIZE: 5,
-            MIN_SPLIT_MASS: 30,
+            MIN_SPLIT_MASS: 20,  // Reduced from 30 to allow banking sooner
             SPLIT_SPEED: 15,
-            SPEED_MULTIPLIER: 8,  // Increased from 5 to 8 for faster movement
+            SPEED_MULTIPLIER: 10,  // Boosted so bigger cells aren't painfully slow
             MASS_LOSS_RATE: 0.002,
             MIN_MASS: 10,
             SAFE_ZONE_SIZE: 400,
@@ -1118,10 +1127,11 @@
                 this.name = name;
                 this.vx = 0;
                 this.vy = 0;
+                this.bankedScore = 0;  // NEW: Permanent banked points
             }
 
             get radius() {
-                return Math.sqrt(this.mass) * 7;  // Increased from 5 to 7 for bigger cells
+                return Math.sqrt(this.mass) * 4.5;  // Reduced from 7 to 4.5 for smaller, more visible cells
             }
 
             get speed() {
@@ -1142,6 +1152,11 @@
 
                     this.x = Math.max(this.radius, Math.min(CONFIG.WORLD_WIDTH - this.radius, this.x));
                     this.y = Math.max(this.radius, Math.min(CONFIG.WORLD_HEIGHT - this.radius, this.y));
+                }
+
+                // Enforce max mass
+                if (this.mass > CONFIG.MAX_MASS) {
+                    this.mass = CONFIG.MAX_MASS;
                 }
 
                 if (this.mass > CONFIG.MIN_MASS) {
@@ -1197,16 +1212,37 @@
             }
 
             split() {
+                // NEW BANKING SYSTEM: Press SPACE to bank half your mass!
                 if (this.mass < CONFIG.MIN_SPLIT_MASS) return null;
-                const newMass = this.mass / 2;
-                const angle = Math.atan2(mouse.y - this.y, mouse.x - this.x);
-                const newCell = new Cell(
-                    this.x + Math.cos(angle) * this.radius,
-                    this.y + Math.sin(angle) * this.radius,
-                    newMass, this.color, this.name
-                );
-                this.mass = newMass;
-                return newCell;
+                
+                const bankAmount = Math.floor(this.mass / 2);
+                this.mass -= bankAmount;
+                this.bankedScore += bankAmount;
+                
+                // Show notification
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: rgba(255, 215, 0, 0.95);
+                    color: #000;
+                    padding: 30px 50px;
+                    border-radius: 20px;
+                    font-size: 2em;
+                    font-weight: bold;
+                    z-index: 10000;
+                    animation: popIn 0.5s;
+                `;
+                notification.textContent = `+${bankAmount} BANKED! 💰`;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 1500);
+                
+                return null; // Don't create a new cell
             }
         }
 
@@ -1249,6 +1285,7 @@
                 x: player.x,
                 y: player.y,
                 mass: player.mass,
+                bankedScore: player.bankedScore,  // NEW: Sync banked score
                 color: player.color,
                 inSafeZone: inSafeZone,
                 lastUpdate: Date.now()
@@ -1461,10 +1498,19 @@
 
         function updateStats() {
             document.getElementById('playerMass').textContent = Math.floor(player.mass);
+            document.getElementById('bankedScore').textContent = player.bankedScore;
+            const totalScore = Math.floor(player.mass + player.bankedScore);
+            document.getElementById('totalScore').textContent = totalScore;
+            
             const allPlayers = [
-                { name: player.name, mass: player.mass },
-                ...Object.values(otherPlayers).map(p => ({ name: p.name, mass: p.mass }))
-            ].sort((a, b) => b.mass - a.mass);
+                { name: player.name, mass: player.mass, bankedScore: player.bankedScore, totalScore: player.mass + player.bankedScore },
+                ...Object.values(otherPlayers).map(p => ({ 
+                    name: p.name, 
+                    mass: p.mass,
+                    bankedScore: p.bankedScore || 0,
+                    totalScore: p.mass + (p.bankedScore || 0)
+                }))
+            ].sort((a, b) => b.totalScore - a.totalScore);
             const rank = allPlayers.findIndex(p => p.name === player.name) + 1;
             document.getElementById('playerRank').textContent = `#${rank}`;
         }
@@ -1476,15 +1522,30 @@
 
         function updateLeaderboard() {
             const allPlayers = [
-                { name: player.name, mass: player.mass, isMe: true },
-                ...Object.values(otherPlayers).map(p => ({ name: p.name, mass: p.mass, isMe: false }))
-            ].sort((a, b) => b.mass - a.mass).slice(0, 10);
+                { 
+                    name: player.name, 
+                    mass: player.mass, 
+                    bankedScore: player.bankedScore,
+                    totalScore: player.mass + player.bankedScore,
+                    isMe: true 
+                },
+                ...Object.values(otherPlayers).map(p => ({ 
+                    name: p.name, 
+                    mass: p.mass,
+                    bankedScore: p.bankedScore || 0,
+                    totalScore: p.mass + (p.bankedScore || 0),
+                    isMe: false 
+                }))
+            ].sort((a, b) => b.totalScore - a.totalScore).slice(0, 10);
 
             const leaderboardHtml = allPlayers.map((p, i) => {
                 const className = p.isMe ? 'leaderboard-entry current-player' : 'leaderboard-entry';
                 return `<div class="${className}">
                     <span>${i + 1}. ${p.name}</span>
-                    <span>${Math.floor(p.mass)}</span>
+                    <span style="display: flex; gap: 8px; align-items: center;">
+                        <span style="color: #4CAF50;">${Math.floor(p.mass)}</span>
+                        <span style="color: #FFD700;">💰${p.bankedScore}</span>
+                    </span>
                 </div>`;
             }).join('');
             document.getElementById('leaderboardList').innerHTML = leaderboardHtml;
