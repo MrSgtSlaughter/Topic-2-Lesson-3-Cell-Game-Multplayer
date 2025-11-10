@@ -2,1335 +2,658 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Mesopotamia Cell Game (Multiplayer + Quiz)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cell Battle - Multiplayer Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=OpenDyslexic&display=swap" rel="stylesheet">
     <style>
-        /* ===================================================================
-           GLOBAL STYLES
-        =================================================================== */
-        body {
+        * {
             margin: 0;
-            display: flex;
-            flex-direction: row;
-            font-family: Arial, sans-serif;
-            background: radial-gradient(circle at top, #1e293b, #020617);
-            color: #e5e7eb;
-            height: 100vh;
-            overflow: hidden;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        #gameContainer {
-            position: relative;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
+        body {
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            background: #f0f0f0;
+        }
+
+        body.dyslexia-font {
+            font-family: 'OpenDyslexic', 'Arial', sans-serif !important;
+        }
+
+        body.dyslexia-font * {
+            font-family: 'OpenDyslexic', 'Arial', sans-serif !important;
+        }
+
+        body.high-contrast {
+            background: #000;
+            color: #fff;
+        }
+
+        body.high-contrast #startMenu {
+            background: #000;
+            border: 3px solid #fff;
+            color: #fff;
+        }
+
+        body.high-contrast .accessibility-panel {
+            background: #000;
+            border: 2px solid #fff;
         }
 
         #gameCanvas {
-            flex: 1;
-            background: radial-gradient(circle, #0f172a 0%, #020617 100%);
             display: block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            cursor: none;
         }
 
-        #uiContainer {
+        body.high-contrast #gameCanvas {
+            background: #000;
+        }
+
+        #startMenu {
             position: absolute;
-            top: 10px;
-            left: 10px;
-            right: 10px;
-            z-index: 10;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            pointer-events: none;
-        }
-
-        .ui-panel {
-            background: rgba(15, 23, 42, 0.9);
-            border-radius: 16px;
-            padding: 10px 14px;
-            margin-bottom: 10px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-            pointer-events: auto;
-        }
-
-        #topLeftPanel {
-            min-width: 260px;
-        }
-
-        #topRightPanel {
-            min-width: 260px;
-            text-align: right;
-        }
-
-        #bottomPanel {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            right: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            pointer-events: none;
-        }
-
-        #controlsPanel {
-            pointer-events: auto;
-            background: rgba(15, 23, 42, 0.9);
-            border-radius: 16px;
-            padding: 10px 14px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-        }
-
-        #messageLog {
-            pointer-events: auto;
-            background: rgba(15, 23, 42, 0.9);
-            border-radius: 16px;
-            padding: 10px 14px;
-            max-width: 420px;
-            max-height: 120px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            z-index: 1000;
+            max-width: 600px;
+            max-height: 90vh;
             overflow-y: auto;
-            font-size: 13px;
         }
 
-        #minimapContainer {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(15, 23, 42, 0.9);
-            border-radius: 16px;
-            padding: 8px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-            pointer-events: auto;
+        #startMenu h1 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 36px;
         }
 
-        #minimap {
+        #startMenu input[type="text"] {
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 20px;
+        }
+
+        #startMenu button {
+            padding: 15px 40px;
+            font-size: 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+
+        #startMenu button:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+
+        .accessibility-panel {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .accessibility-panel h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .accessibility-option {
+            margin: 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .accessibility-option input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .accessibility-option label {
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #667eea;
             border-radius: 8px;
-            background: #020617;
+            background: white;
+            cursor: pointer;
+        }
+
+        #leaderboard, #stats {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            z-index: 100;
+        }
+
+        body.high-contrast #leaderboard,
+        body.high-contrast #stats {
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #fff;
+            color: #fff;
         }
 
         #leaderboard {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 260px;
-            background: rgba(15, 23, 42, 0.95);
-            border-radius: 16px;
-            padding: 12px 16px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
-            pointer-events: auto;
+            top: 20px;
+            right: 20px;
+            min-width: 200px;
         }
 
-        #leaderboard h3 {
-            margin: 0 0 8px 0;
-            font-size: 16px;
+        #stats {
+            top: 20px;
+            left: 20px;
         }
 
-        #leaderboardList {
-            font-size: 13px;
-            max-height: 260px;
-            overflow-y: auto;
+        #leaderboard h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
         }
 
-        #leaderboardList .leaderboard-entry {
+        body.high-contrast #leaderboard h2,
+        body.high-contrast #stats h3 {
+            color: #fff;
+            border-bottom-color: #fff;
+        }
+
+        .leaderboard-entry {
+            padding: 8px;
+            margin: 5px 0;
+            background: #f8f8f8;
+            border-radius: 8px;
             display: flex;
             justify-content: space-between;
-            padding: 4px 0;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-        }
-
-        #leaderboardList .leaderboard-entry span.name {
-            max-width: 120px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        #leaderboardList .leaderboard-entry span.stats {
-            text-align: right;
-            font-family: monospace;
-        }
-
-        #startScreen {
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at top, rgba(15, 23, 42, 0.98), rgba(2, 6, 23, 0.98));
-            display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            z-index: 100;
-            color: #e5e7eb;
         }
 
-        #startScreen h1 {
-            font-size: 32px;
+        body.high-contrast .leaderboard-entry {
+            background: #333;
+            color: #fff;
+        }
+
+        .leaderboard-entry.current-player {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        body.high-contrast .leaderboard-entry.current-player {
+            background: #fff;
+            color: #000;
+        }
+
+        #stats h3 {
+            color: #667eea;
             margin-bottom: 10px;
         }
 
-        #startScreen h2 {
-            font-size: 20px;
-            margin-bottom: 20px;
-            color: #93c5fd;
+        .stat-item {
+            margin: 5px 0;
+            font-size: 16px;
         }
 
-        #startScreen label {
+        #instructions {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        body.high-contrast #instructions {
+            background: #333;
+        }
+
+        #instructions h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        body.high-contrast #instructions h3 {
+            color: #fff;
+        }
+
+        #instructions ul {
+            margin-left: 20px;
+        }
+
+        #instructions li {
+            margin: 8px 0;
+            line-height: 1.4;
+        }
+
+        .accessibility-controls {
+            position: absolute;
+            top: 20px;
+            right: 250px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 100;
+        }
+
+        body.high-contrast .accessibility-controls {
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #fff;
+        }
+
+        .accessibility-controls button {
             display: block;
-            margin-bottom: 6px;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            font-size: 14px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .accessibility-controls button:hover {
+            background: #764ba2;
+        }
+
+        #minimap {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 3px solid #667eea;
+            border-radius: 10px;
+            z-index: 100;
+        }
+
+        body.high-contrast #minimap {
+            background: rgba(0, 0, 0, 0.9);
+            border-color: #fff;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .speaker-icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: #667eea;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            color: white;
+            cursor: pointer;
             font-size: 14px;
         }
 
-        #startScreen input, #startScreen select {
-            width: 260px;
-            padding: 8px;
-            margin-bottom: 12px;
-            border-radius: 8px;
-            border: 1px solid #4b5563;
-            background: #020617;
-            color: #e5e7eb;
-        }
-
-        #startButton {
-            width: 260px;
-            padding: 10px;
-            border-radius: 9999px;
-            border: none;
-            background: linear-gradient(90deg, #f97316, #facc15);
-            color: #111827;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 8px;
-        }
-
-        #startButton:hover {
-            filter: brightness(1.1);
-        }
-
-        #languageSelector {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 200;
-        }
-
-        #languageSelector select {
-            padding: 5px 8px;
-            border-radius: 9999px;
-            border: 1px solid #4b5563;
-            background: rgba(15, 23, 42, 0.95);
-            color: #e5e7eb;
-            font-size: 12px;
-        }
-
-        #voiceToggle {
-            position: absolute;
-            top: 10px;
-            left: 140px;
-            z-index: 200;
-            cursor: pointer;
-            background: rgba(15, 23, 42, 0.95);
-            padding: 5px 8px;
-            border-radius: 9999px;
-            border: 1px solid #4b5563;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        #voiceToggle span {
-            font-size: 16px;
-        }
-
-        .stat-line {
-            font-size: 13px;
-            margin: 2px 0;
-        }
-
-        .stat-label {
-            color: #9ca3af;
-        }
-
-        .stat-value {
-            color: #e5e7eb;
-            font-weight: bold;
-        }
-
-        #roomSelector {
-            margin-top: 8px;
-            font-size: 12px;
-        }
-
-        #roomSelect {
-            padding: 4px 6px;
-            border-radius: 9999px;
-            border: 1px solid #4b5563;
-            background: #020617;
-            color: #e5e7eb;
-        }
-
-        #helpButton {
-            margin-left: 8px;
-            padding: 3px 8px;
-            border-radius: 9999px;
-            border: 1px solid #4b5563;
-            background: rgba(15, 23, 42, 0.95);
-            color: #e5e7eb;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        #quizButton {
-            padding: 6px 10px;
-            border-radius: 9999px;
-            border: none;
-            background: linear-gradient(90deg, #22c55e, #a3e635);
-            color: #052e16;
-            font-weight: bold;
-            font-size: 12px;
-            cursor: pointer;
-            margin-left: 8px;
-        }
-
-        #quizButton:hover {
-            filter: brightness(1.1);
-        }
-
-        .safe-zone-label {
-            position: absolute;
-            padding: 4px 8px;
-            background: rgba(22, 163, 74, 0.9);
-            color: white;
-            border-radius: 9999px;
-            font-size: 11px;
-            pointer-events: none;
-            white-space: nowrap;
-        }
-
-        #safeZoneTimer {
-            font-size: 12px;
-            color: #22c55e;
-            margin-top: 4px;
-        }
-
-        #deathOverlay {
-            position: absolute;
-            inset: 0;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            background: rgba(15, 23, 42, 0.9);
-            z-index: 120;
-            color: #f87171;
-            font-size: 24px;
-            flex-direction: column;
-        }
-
-        #deathOverlay button {
-            margin-top: 15px;
-            padding: 8px 16px;
-            border-radius: 9999px;
-            border: none;
-            background: #f97316;
-            color: #111827;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        #deathOverlay button:hover {
-            filter: brightness(1.1);
-        }
-
-        #messageLog::-webkit-scrollbar,
-        #leaderboardList::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        #messageLog::-webkit-scrollbar-thumb,
-        #leaderboardList::-webkit-scrollbar-thumb {
-            background: #4b5563;
-            border-radius: 9999px;
-        }
-
-        #messageLog::-webkit-scrollbar-track,
-        #leaderboardList::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        #playerCount {
-            font-size: 12px;
-            margin-top: 4px;
-            color: #9ca3af;
-        }
-
-        .room-link {
-            display: inline-block;
-            margin-top: 4px;
-            font-size: 11px;
-            color: #93c5fd;
-        }
-
-        .start-bg-triangle {
-            position: absolute;
-            width: 400px;
-            height: 400px;
-            background: conic-gradient(
-                from 180deg at 50% 50%,
-                rgba(56, 189, 248, 0.15),
-                rgba(129, 140, 248, 0.25),
-                rgba(56, 189, 248, 0.15)
-            );
-            filter: blur(40px);
-            opacity: 0.8;
-            z-index: -1;
-        }
-
-        .start-bg-triangle.left {
-            top: 10%;
-            left: 10%;
-        }
-
-        .start-bg-triangle.right {
-            bottom: 5%;
-            right: 15%;
-        }
-
-        @media (max-width: 768px) {
-            #leaderboard {
-                display: none;
-            }
-            #messageLog {
-                max-width: 260px;
-            }
-            #startScreen h1 {
-                font-size: 24px;
-            }
-            #startScreen h2 {
-                font-size: 16px;
-            }
+        .speaker-icon:hover {
+            background: #764ba2;
         }
 
         @keyframes popIn {
-            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            0% { transform: translate(-50%, -50%) scale(0); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); }
         }
     </style>
 </head>
 <body>
-    <div id="languageSelector">
-        <select id="languageSelect">
-            <option value="en">English</option>
-            <option value="es">Español</option>
-        </select>
-    </div>
-
-    <div id="voiceToggle">
-        <span id="voiceIcon">🔊</span>
-        <span id="voiceLabel">Voice: On</span>
-    </div>
-
-    <div id="gameContainer">
-        <canvas id="gameCanvas"></canvas>
-
-        <div id="uiContainer">
-            <div id="topLeftPanel" class="ui-panel">
-                <div class="stat-line"><span class="stat-label" data-i18n="player">Player</span>: <span id="playerNameDisplay" class="stat-value">-</span></div>
-                <div class="stat-line"><span class="stat-label" data-i18n="mass">Mass</span>: <span id="massDisplay" class="stat-value">0</span></div>
-                <div class="stat-line"><span class="stat-label" data-i18n="banked">Banked</span>: <span id="bankedDisplay" class="stat-value">0</span></div>
-                <div class="stat-line"><span class="stat-label" data-i18n="room">Room</span>: <span id="roomDisplay" class="stat-value">A</span></div>
-                <div id="safeZoneTimer"></div>
-                <div id="playerCount"></div>
-                <div id="roomSelector">
-                    <label for="roomSelect" data-i18n="changeRoom">Change Room:</label>
-                    <select id="roomSelect">
-                        <option value="room-a">Room A</option>
-                        <option value="room-b">Room B</option>
-                        <option value="room-c">Room C</option>
-                        <option value="room-d">Room D</option>
-                    </select>
-                    <button id="helpButton" data-i18n="help">Help</button>
-                    <button id="quizButton">Quiz</button>
-                </div>
+    <canvas id="gameCanvas"></canvas>
+    
+    <div id="startMenu">
+        <h1>🎮 Cell Battle</h1>
+        <p>Mesopotamia Edition - Topic 2 Lesson 3</p>
+        
+        <!-- Accessibility Features -->
+        <div class="accessibility-panel">
+            <h3>
+                🎮 Helpful Tools
+                <span class="speaker-icon" onclick="speakText('Helpful Tools panel. Customize the game to work best for you.')" title="Read aloud">🔊</span>
+            </h3>
+            
+            <div class="accessibility-option">
+                <input type="checkbox" id="dyslexiaFont">
+                <label for="dyslexiaFont">
+                    Easy-Read Font
+                    <span class="speaker-icon" onclick="speakText('Enable easy-read font with clearer letter shapes')" title="Read aloud">🔊</span>
+                </label>
+            </div>
+            
+            <div class="accessibility-option">
+                <input type="checkbox" id="highContrast">
+                <label for="highContrast">
+                    High Contrast Colors
+                    <span class="speaker-icon" onclick="speakText('Enable high contrast black and white colors for easier viewing')" title="Read aloud">🔊</span>
+                </label>
+            </div>
+            
+            <div class="accessibility-option">
+                <input type="checkbox" id="textToSpeech" checked>
+                <label for="textToSpeech">
+                    Read Text Aloud
+                    <span class="speaker-icon" onclick="speakText('Turn on automatic reading of game text out loud')" title="Read aloud">🔊</span>
+                </label>
+            </div>
+            
+            <div class="accessibility-option">
+                <input type="checkbox" id="largerText">
+                <label for="largerText">
+                    Bigger Text
+                    <span class="speaker-icon" onclick="speakText('Make all text bigger and easier to read')" title="Read aloud">🔊</span>
+                </label>
+            </div>
+            
+            <div class="accessibility-option">
+                <label for="languageSelect">
+                    Language:
+                    <span class="speaker-icon" onclick="speakText('Choose your preferred language')" title="Read aloud">🔊</span>
+                </label>
+                <select id="languageSelect">
+                    <option value="en">English</option>
+                    <option value="es">Español (Spanish)</option>
+                    <option value="fr">Français (French)</option>
+                    <option value="zh">中文 (Chinese)</option>
+                    <option value="ar">العربية (Arabic)</option>
+                    <option value="pt">Português (Portuguese)</option>
+                </select>
             </div>
 
-            <div id="topRightPanel" class="ui-panel">
-                <div id="instructionsShort">
-                    <div data-i18n="goalTitle" style="font-weight:bold;">Goal:</div>
-                    <div data-i18n="goalText">Grow your cell by eating food &amp; smaller players. Use safe zones to bank your score with SPACE.</div>
-                </div>
+            <div class="accessibility-option">
+                <label for="speechRate">
+                    Voice Speed:
+                    <span class="speaker-icon" onclick="speakText('Choose how fast the voice reads')" title="Read aloud">🔊</span>
+                </label>
+                <select id="speechRate">
+                    <option value="0.5">Slow</option>
+                    <option value="0.75">Medium-Slow</option>
+                    <option value="1" selected>Normal</option>
+                    <option value="1.25">Medium-Fast</option>
+                    <option value="1.5">Fast</option>
+                </select>
             </div>
         </div>
 
-        <div id="bottomPanel">
-            <div id="controlsPanel">
-                <div style="font-size: 12px; line-height: 1.4;">
-                    <span data-i18n="controlsHeader" style="font-weight:bold;">Controls:</span>
-                    <span data-i18n="controlsText">
-                        Move with mouse/trackpad or arrow keys/WASD. Press SPACE to bank half your mass (safe zones only).
-                    </span>
-                </div>
-            </div>
-            <div id="messageLog"></div>
-        </div>
-
-        <div id="leaderboard">
-            <h3>🏆 Leaderboard</h3>
-            <div id="leaderboardList"></div>
-        </div>
-
-        <div id="minimapContainer">
-            <canvas id="minimap" width="200" height="200"></canvas>
-        </div>
-
-        <div id="deathOverlay">
-            <div id="deathMessage">You were eaten!</div>
-            <button id="respawnButton">Respawn</button>
-        </div>
-
-        <div id="startScreen">
-            <div class="start-bg-triangle left"></div>
-            <div class="start-bg-triangle right"></div>
-            <h1>Mesopotamia Cell Arena</h1>
-            <h2>Grow, Survive, and Learn!</h2>
-            <label for="nameInput">Your Name:</label>
-            <input id="nameInput" placeholder="Type your name..." maxlength="16" />
-            <label for="classRoomSelect">Class / Room:</label>
-            <select id="classRoomSelect">
-                <option value="room-a">Room A</option>
-                <option value="room-b">Room B</option>
-                <option value="room-c">Room C</option>
-                <option value="room-d">Room D</option>
+        <input type="text" id="playerName" placeholder="Enter your name" maxlength="20" />
+        
+        <div style="margin: 20px 0;">
+            <label style="font-size: 18px; color: #667eea; font-weight: bold;">Choose Your Room:</label>
+            <select id="roomSelect" style="width: 100%; max-width: 300px; padding: 15px; font-size: 18px; border: 2px solid #667eea; border-radius: 10px; margin-top: 10px;">
+                <option value="room-a">🟢 Room A (Players: <span id="countA">0</span>)</option>
+                <option value="room-b">🔵 Room B (Players: <span id="countB">0</span>)</option>
+                <option value="room-c">🟡 Room C (Players: <span id="countC">0</span>)</option>
+                <option value="room-d">🔴 Room D (Players: <span id="countD">0</span>)</option>
             </select>
-            <button id="startButton">Start Playing</button>
-            <div style="margin-top: 10px; font-size: 12px; color: #9ca3af;">
-                Move with mouse/trackpad or arrow keys/WASD. Press <strong>SPACE</strong> in a green safe zone to bank points!
-            </div>
+            <p style="margin-top: 10px; color: #666; font-size: 14px;">💡 Pick the room with fewer players for best experience!</p>
+        </div>
+        
+        <button id="startButton">Start Game</button>
+        <button id="readInstructions">🔊 Read Instructions Aloud</button>
+        
+        <div id="instructions">
+            <h3>📚 How to Play:</h3>
+            <ul>
+                <li><strong>Pick a Room:</strong> Choose a room with fewer players</li>
+                <li><strong>Move:</strong> Use your mouse or trackpad, or arrow keys / W-A-S-D to control your cell</li>
+                <li><strong>Grow:</strong> Eat smaller cells and food pellets (smaller=faster, bigger=slower, but not painfully slow)</li>
+                <li><strong>Quiz Questions:</strong> 📜 Answer Mesopotamia questions every 40 seconds (+10 mass correct, -10 mass wrong)</li>
+                <li><strong>Safe Zones:</strong> 🛡️ Green corners protect you for 15 seconds</li>
+                <li><strong>💰 BANKING:</strong> Press SPACE to bank half your mass into permanent score (keeps even if eaten!)</li>
+                <li><strong>Goal:</strong> Build the highest BANKED SCORE!</li>
+            </ul>
         </div>
     </div>
 
-    <!-- Firebase App (replace config with your own if needed) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <div id="stats" class="hidden">
+        <h3>📊 Your Stats</h3>
+        <div class="stat-item">Current Mass: <strong id="playerMass">10</strong></div>
+        <div class="stat-item">Banked: <strong style="color: #FFD700;" id="bankedScore">0</strong> 💰</div>
+        <div class="stat-item">Total Score: <strong style="color: #4CAF50;" id="totalScore">0</strong></div>
+        <div class="stat-item">Rank (by banked): <strong id="playerRank">-</strong></div>
+        <div class="stat-item">Players: <strong id="playerCount">1</strong></div>
+    </div>
+
+    <div class="accessibility-controls hidden" id="gameAccessibility">
+        <button onclick="speakGameStatus()">🔊 My Stats</button>
+        <button onclick="speakLeaderboard()">🔊 Leaders</button>
+        <button onclick="toggleAccessibilityHelp()">📖 Help</button>
+    </div>
+
+    <div id="leaderboard" class="hidden">
+        <h2>🏆 Leaderboard (Banked)</h2>
+        <div id="leaderboardList"></div>
+    </div>
+
+    <canvas id="minimap" class="hidden"></canvas>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <script>
         // ===================================================================
-        // TRANSLATIONS
-        // ===================================================================
-        const translations = {
-            en: {
-                player: "Player",
-                mass: "Mass",
-                banked: "Banked",
-                room: "Room",
-                changeRoom: "Change Room:",
-                help: "Help",
-                goalTitle: "Goal:",
-                goalText: "Grow your cell by eating food & smaller players. Use safe zones to bank your score with SPACE.",
-                controlsHeader: "Controls:",
-                controlsText: "Move with mouse/trackpad or arrow keys/WASD. Press SPACE to bank half your mass (safe zones only).",
-                split: "You banked half your mass!",
-                death: "You were eaten!",
-                respawn: "Respawn",
-                safeZoneEnter: "You entered a safe zone! Press SPACE to bank half your mass.",
-                safeZoneExit: "You left the safe zone.",
-                instructions:
-                    "Welcome! Move with your mouse/trackpad or arrow keys/WASD. Eat the small dots to grow. If you are bigger than another player, you can eat them. " +
-                    "Green safe zones let you press SPACE to bank half your mass as permanent score. The quiz button triggers a Mesopotamia question that can gain or lose mass."
-            },
-            es: {
-                player: "Jugador",
-                mass: "Masa",
-                banked: "Guardado",
-                room: "Sala",
-                changeRoom: "Cambiar sala:",
-                help: "Ayuda",
-                goalTitle: "Objetivo:",
-                goalText: "Haz crecer tu célula comiendo comida y jugadores más pequeños. Usa las zonas seguras para guardar tu puntuación con ESPACIO.",
-                controlsHeader: "Controles:",
-                controlsText: "Muévete con el ratón/panel táctil o las flechas/WASD. Presiona ESPACIO para guardar la mitad de tu masa (solo en zonas seguras).",
-                split: "¡Guardaste la mitad de tu masa!",
-                death: "¡Te comieron!",
-                respawn: "Reaparecer",
-                safeZoneEnter: "¡Entraste en una zona segura! Pulsa ESPACIO para guardar la mitad de tu masa.",
-                safeZoneExit: "Saliste de la zona segura.",
-                instructions:
-                    "¡Bienvenido! Muévete con el ratón/panel táctil o las flechas/WASD. Come los puntos pequeños para crecer. Si eres más grande que otro jugador, puedes comértelo. " +
-                    "Las zonas seguras verdes te permiten presionar ESPACIO para guardar la mitad de tu masa como puntuación permanente. El botón de examen lanza una pregunta de Mesopotamia que puede darte o quitarte masa."
-            }
-        };
-
-        let currentLanguage = 'en';
-        let voiceEnabled = true;
-
-        function getTranslation(key) {
-            const langPack = translations[currentLanguage] || translations.en;
-            return langPack[key] || translations.en[key] || key;
-        }
-
-        function applyTranslations() {
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                el.textContent = getTranslation(key);
-            });
-        }
-
-        // ===================================================================
-        // TEXT-TO-SPEECH
-        // ===================================================================
-        function speakText(text, interrupt = false) {
-            if (!('speechSynthesis' in window)) return;
-            if (!voiceEnabled) return;
-            const synth = window.speechSynthesis;
-            if (interrupt) {
-                synth.cancel();
-            }
-            const utter = new SpeechSynthesisUtterance(text);
-            utter.lang = currentLanguage === 'es' ? 'es-ES' : 'en-US';
-            synth.speak(utter);
-        }
-
-        // ===================================================================
-        // FIREBASE INITIALIZATION
+        // FIREBASE CONFIGURATION
         // ===================================================================
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY_HERE",
-            authDomain: "your-project.firebaseapp.com",
-            databaseURL: "https://your-project-default-rtdb.firebaseio.com",
-            projectId: "your-project",
-            storageBucket: "your-project.appspot.com",
-            messagingSenderId: "000000000000",
-            appId: "1:000000000000:web:0000000000000000"
+            apiKey: "AIzaSyC-3Nf96W-AKn-J2gyn9krCB3n5O5iISOo",
+            authDomain: "cell-battle-game.firebaseapp.com",
+            databaseURL: "https://cell-battle-game-default-rtdb.firebaseio.com",
+            projectId: "cell-battle-game",
+            storageBucket: "cell-battle-game.firebasestorage.app",
+            messagingSenderId: "482967839438",
+            appId: "1:482967839438:web:7b291ef4b2d2bc098a269f"
         };
 
+        let database;
         let firebaseEnabled = false;
-        let database = null;
         let mesoDb = null;
 
         try {
             firebase.initializeApp(firebaseConfig);
             database = firebase.database();
-            mesoDb = firebase.firestore();
             firebaseEnabled = true;
-            console.log("Firebase initialized");
-        } catch (err) {
-            console.warn("Firebase initialization failed. Running in local-only mode.", err);
-        }
-
-        // ===================================================================
-        // CANVAS & GLOBALS
-        // ===================================================================
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const minimapCanvas = document.getElementById('minimap');
-        const minimapCtx = minimapCanvas.getContext('2d');
-
-        let gameStarted = false;
-        let playerId = null;
-        let playerName = '';
-        let currentRoom = 'room-a';
-        let player = null;
-        let otherPlayers = {};
-        let food = [];
-        let camera = { x: 0, y: 0 };
-        let mouse = { x: 0, y: 0 };
-        let keys = {
-            ArrowUp: false,
-            ArrowDown: false,
-            ArrowLeft: false,
-            ArrowRight: false,
-            KeyW: false,
-            KeyA: false,
-            KeyS: false,
-            KeyD: false
-        };
-        const MOVE_KEYS = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyW','KeyA','KeyS','KeyD'];
-
-        let lastUpdate = Date.now();
-        let lastMass = 0;
-        let inSafeZone = false;
-        let safeZoneEnterTime = 0;
-        let currentSafeZone = null;
-
-        const safeZoneLabels = [];
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        // ===================================================================
-        // GAME CONFIGURATION
-        // ===================================================================
-        const CONFIG = {
-            WORLD_WIDTH: 3000,
-            WORLD_HEIGHT: 3000,
-            INITIAL_MASS: 10,
-            MAX_MASS: 300,
-            FOOD_MASS: 1,
-            MAX_FOOD: 300,
-            FOOD_SIZE: 5,
-            MIN_SPLIT_MASS: 20,
-            SPLIT_SPEED: 15,
-            SPEED_MULTIPLIER: 10,
-            MASS_LOSS_RATE: 0.002,
-            MIN_MASS: 10,
-            SAFE_ZONE_SIZE: 400,
-            SAFE_ZONE_TIME: 15000
-        };
-
-        function clampMass(mass) {
-            return Math.max(CONFIG.MIN_MASS, Math.min(CONFIG.MAX_MASS, mass));
-        }
-
-        const SAFE_ZONES = [
-            { x: 200, y: 200, label: 'Top Left' },
-            { x: CONFIG.WORLD_WIDTH - 200, y: 200, label: 'Top Right' },
-            { x: 200, y: CONFIG.WORLD_HEIGHT - 200, label: 'Bottom Left' },
-            { x: CONFIG.WORLD_WIDTH - 200, y: CONFIG.WORLD_HEIGHT - 200, label: 'Bottom Right' }
-        ];
-
-        // ===================================================================
-        // UTILS
-        // ===================================================================
-        function randColor() {
-            const colors = ['#22c55e', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6', '#14b8a6'];
-            return colors[Math.floor(Math.random() * colors.length)];
-        }
-
-        function getRandomPosition() {
-            return {
-                x: Math.random() * CONFIG.WORLD_WIDTH,
-                y: Math.random() * CONFIG.WORLD_HEIGHT
-            };
-        }
-
-        function addMessage(text) {
-            const log = document.getElementById('messageLog');
-            const div = document.createElement('div');
-            div.textContent = text;
-            log.appendChild(div);
-            log.scrollTop = log.scrollHeight;
-        }
-
-        // ===================================================================
-        // CELL CLASS
-        // ===================================================================
-        class Cell {
-            constructor(x, y, mass, color, name = '') {
-                this.x = x;
-                this.y = y;
-                this.mass = mass;
-                this.color = color;
-                this.name = name;
-                this.vx = 0;
-                this.vy = 0;
-                this.bankedScore = 0;
+            console.log("Firebase connected successfully!");
+            
+            // Initialize Firestore for quiz logging
+            try {
+                mesoDb = firebase.firestore();
+                console.log("Firestore connected for quiz logging!");
+            } catch (e) {
+                console.warn("Firestore not available:", e);
             }
-
-            get radius() {
-                return Math.sqrt(this.mass) * 4.5;
-            }
-
-            get speed() {
-                return CONFIG.SPEED_MULTIPLIER / Math.sqrt(this.mass);
-            }
-
-            move(targetX, targetY) {
-                const dx = targetX - this.x;
-                const dy = targetY - this.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-
-                if (dist > 10) {
-                    this.vx = (dx / dist) * this.speed;
-                    this.vy = (dy / dist) * this.speed;
-
-                    this.x += this.vx;
-                    this.y += this.vy;
-
-                    this.x = Math.max(this.radius, Math.min(CONFIG.WORLD_WIDTH - this.radius, this.x));
-                    this.y = Math.max(this.radius, Math.min(CONFIG.WORLD_HEIGHT - this.radius, this.y));
-                }
-
-                this.mass = clampMass(this.mass);
-
-                if (this.mass > CONFIG.MIN_MASS) {
-                    this.mass -= CONFIG.MASS_LOSS_RATE;
-                    this.mass = clampMass(this.mass);
-                }
-            }
-
-            draw(ctx, camX, camY) {
-                const screenX = this.x - camX;
-                const screenY = this.y - camY;
-
-                if (this.inSafeZone) {
-                    const pulse = Math.sin(Date.now() / 300) * 0.2 + 0.8;
-                    ctx.strokeStyle = 'rgba(0, 255, 100, ' + pulse + ')';
-                    ctx.lineWidth = 5;
-                    ctx.beginPath();
-                    ctx.arc(screenX, screenY, this.radius + 8, 0, Math.PI * 2);
-                    ctx.stroke();
-                }
-
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.arc(screenX, screenY, this.radius, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.strokeStyle = "#0f172a";
-                ctx.lineWidth = 2;
-                ctx.stroke();
-
-                ctx.fillStyle = "#e5e7eb";
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-
-                if (this.name) {
-                    ctx.font = 'bold 16px Arial';
-                    ctx.fillText(this.name, screenX, screenY - 5);
-                    ctx.font = '14px Arial';
-                    ctx.fillText(Math.floor(this.mass), screenX, screenY + 15);
-                }
-            }
-
-            canEat(otherCell) {
-                return this.mass > otherCell.mass * 1.2;
-            }
-
-            eat(otherCell) {
-                this.mass = clampMass(this.mass + otherCell.mass);
-            }
-
-            split() {
-                if (this.mass < CONFIG.MIN_SPLIT_MASS) return null;
-
-                const bankAmount = Math.floor(this.mass / 2);
-                this.mass -= bankAmount;
-                this.bankedScore += bankAmount;
-
-                const notification = document.createElement('div');
-                notification.style.cssText = `
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background: rgba(255, 215, 0, 0.95);
-                    color: #000;
-                    padding: 30px 50px;
-                    border-radius: 20px;
-                    font-size: 2em;
-                    font-weight: bold;
-                    z-index: 10000;
-                    animation: popIn 0.5s;
-                `;
-                notification.textContent = `+${bankAmount} BANKED! 💰`;
-                document.body.appendChild(notification);
-
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 1500);
-
-                this.mass = clampMass(this.mass);
-                return null;
-            }
+        } catch (error) {
+            console.warn("Firebase not configured. Running in single-player mode.");
         }
 
         // ===================================================================
-        // FOOD & FIREBASE
+        // MESOPOTAMIA QUIZ SYSTEM - Topic 2 Lesson 3
         // ===================================================================
-        function generateFood() {
-            while (food.length < CONFIG.MAX_FOOD) {
-                const pos = getRandomPosition();
-                food.push({
-                    id: 'food_' + Date.now() + '_' + Math.random(),
-                    x: pos.x,
-                    y: pos.y,
-                    mass: CONFIG.FOOD_MASS,
-                    radius: CONFIG.FOOD_SIZE,
-                    color: '#facc15'
-                });
-            }
-        }
-
-        function drawFood() {
-            food.forEach(f => {
-                const screenX = f.x - camera.x;
-                const screenY = f.y - camera.y;
-                if (screenX > -50 && screenX < canvas.width + 50 &&
-                    screenY > -50 && screenY < canvas.height + 50) {
-                    ctx.fillStyle = f.color;
-                    ctx.beginPath();
-                    ctx.arc(screenX, screenY, f.radius, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            });
-        }
-
-        function syncPlayerToFirebase() {
-            if (!firebaseEnabled || !player) return;
-
-            database.ref('rooms/' + currentRoom + '/players/' + playerId).set({
-                id: playerId,
-                name: player.name,
-                x: player.x,
-                y: player.y,
-                mass: clampMass(player.mass),
-                bankedScore: player.bankedScore,
-                color: player.color,
-                inSafeZone: inSafeZone,
-                lastUpdate: Date.now()
-            });
-        }
-
-        function listenToOtherPlayers() {
-            if (!firebaseEnabled) return;
-            database.ref('rooms/' + currentRoom + '/players').on('value', (snapshot) => {
-                const players = snapshot.val();
-                otherPlayers = {};
-                if (players) {
-                    Object.keys(players).forEach(id => {
-                        if (id !== playerId) {
-                            const p = players[id];
-                            if (Date.now() - p.lastUpdate < 10000) {
-                                const safeMass = clampMass(p.mass || CONFIG.INITIAL_MASS);
-                                const cell = new Cell(p.x, p.y, safeMass, p.color, p.name);
-                                cell.bankedScore = p.bankedScore || 0;
-                                cell.inSafeZone = p.inSafeZone || false;
-                                otherPlayers[id] = cell;
-                            }
-                        }
-                    });
-                }
-                updatePlayerCount();
-            });
-        }
-
-        function removePlayerFromFirebase() {
-            if (!firebaseEnabled || !playerId) return;
-            database.ref('rooms/' + currentRoom + '/players/' + playerId).remove();
-        }
-
-        function listenForDeaths() {
-            if (!firebaseEnabled) return;
-            database.ref('rooms/' + currentRoom + '/deaths/' + playerId).on('value', (snapshot) => {
-                const deathData = snapshot.val();
-                if (deathData && gameStarted) {
-                    speakText(`Oh no! ${deathData.killerName} ate you!`);
-                    respawnPlayer();
-                }
-            });
-        }
-
-        function logDeath(victimId, killerName) {
-            if (!firebaseEnabled) return;
-            database.ref('rooms/' + currentRoom + '/deaths/' + victimId).set({
-                killerName,
-                time: Date.now()
-            });
-        }
-
-        // ===================================================================
-        // SAFE ZONES
-        // ===================================================================
-        function drawSafeZones() {
-            SAFE_ZONES.forEach((zone, index) => {
-                const screenX = zone.x - camera.x;
-                const screenY = zone.y - camera.y;
-                const radius = CONFIG.SAFE_ZONE_SIZE;
-
-                const gradient = ctx.createRadialGradient(
-                    screenX, screenY, radius * 0.1,
-                    screenX, screenY, radius
-                );
-                gradient.addColorStop(0, 'rgba(34, 197, 94, 0.25)');
-                gradient.addColorStop(1, 'rgba(22, 163, 74, 0.02)');
-
-                ctx.fillStyle = gradient;
-                ctx.beginPath();
-                ctx.arc(screenX, screenY, radius, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.strokeStyle = 'rgba(34, 197, 94, 0.7)';
-                ctx.lineWidth = 2;
-                ctx.setLineDash([10, 10]);
-                ctx.beginPath();
-                ctx.arc(screenX, screenY, radius, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.setLineDash([]);
-
-                const labelEl = safeZoneLabels[index];
-                if (labelEl) {
-                    const rect = canvas.getBoundingClientRect();
-                    labelEl.style.left = (screenX + rect.left) + 'px';
-                    labelEl.style.top = (screenY + rect.top - radius - 20) + 'px';
-                }
-            });
-        }
-
-        function isInSafeZone(x, y) {
-            for (let i = 0; i < SAFE_ZONES.length; i++) {
-                const zone = SAFE_ZONES[i];
-                const dx = x - zone.x;
-                const dy = y - zone.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist <= CONFIG.SAFE_ZONE_SIZE) {
-                    return zone;
-                }
-            }
-            return null;
-        }
-
-        function updateSafeZoneLabels() {
-            const containerRect = canvas.getBoundingClientRect();
-            SAFE_ZONES.forEach((zone, index) => {
-                const labelEl = safeZoneLabels[index];
-                if (!labelEl) return;
-                const screenX = zone.x - camera.x;
-                const screenY = zone.y - camera.y;
-                labelEl.style.left = (screenX + containerRect.left - 30) + 'px';
-                labelEl.style.top = (screenY + containerRect.top - CONFIG.SAFE_ZONE_SIZE - 30) + 'px';
-            });
-        }
-
-        function checkSafeZoneStatus() {
-            const zone = isInSafeZone(player.x, player.y);
-            const safeTimerEl = document.getElementById('safeZoneTimer');
-
-            if (zone && !inSafeZone) {
-                inSafeZone = true;
-                safeZoneEnterTime = Date.now();
-                currentSafeZone = zone;
-                addMessage(getTranslation('safeZoneEnter'));
-                speakText(getTranslation('safeZoneEnter'));
-            } else if (!zone && inSafeZone) {
-                inSafeZone = false;
-                currentSafeZone = null;
-                safeTimerEl.textContent = '';
-                addMessage(getTranslation('safeZoneExit'));
-                speakText(getTranslation('safeZoneExit'));
-            }
-
-            if (inSafeZone && safeZoneEnterTime) {
-                const elapsed = Date.now() - safeZoneEnterTime;
-                const remaining = Math.max(0, CONFIG.SAFE_ZONE_TIME - elapsed);
-                const seconds = Math.ceil(remaining / 1000);
-                safeTimerEl.textContent = `Safe Zone Time: ${seconds}s`;
-                if (remaining <= 0) {
-                    inSafeZone = false;
-                    currentSafeZone = null;
-                    safeTimerEl.textContent = '';
-                    addMessage("Time's up! You left the safe zone.");
-                    speakText("Time's up! Ejected from safe zone!");
-                }
-            }
-        }
-
-        // ===================================================================
-        // WORLD RENDERING
-        // ===================================================================
-        function drawGrid() {
-            const gridSize = 100;
-            ctx.strokeStyle = 'rgba(148, 163, 184, 0.2)';
-            ctx.lineWidth = 0.5;
-
-            const startX = -camera.x % gridSize;
-            const startY = -camera.y % gridSize;
-
-            for (let x = startX; x < canvas.width; x += gridSize) {
-                ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, canvas.height);
-                ctx.stroke();
-            }
-            for (let y = startY; y < canvas.height; y += gridSize) {
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(canvas.width, y);
-                ctx.stroke();
-            }
-        }
-
-        function drawWorldBorder() {
-            const left = -camera.x;
-            const top = -camera.y;
-            const right = CONFIG.WORLD_WIDTH - camera.x;
-            const bottom = CONFIG.WORLD_HEIGHT - camera.y;
-
-            ctx.strokeStyle = '#38bdf8';
-            ctx.lineWidth = 4;
-            ctx.strokeRect(left, top, right - left, bottom - top);
-        }
-
-        function updateCamera() {
-            camera.x = player.x - canvas.width / 2;
-            camera.y = player.y - canvas.height / 2;
-            camera.x = Math.max(0, Math.min(CONFIG.WORLD_WIDTH - canvas.width, camera.x));
-            camera.y = Math.max(0, Math.min(CONFIG.WORLD_HEIGHT - canvas.height, camera.y));
-        }
-
-        function updateStats() {
-            document.getElementById('massDisplay').textContent = Math.floor(player.mass);
-            document.getElementById('bankedDisplay').textContent = player.bankedScore;
-            document.getElementById('playerNameDisplay').textContent = player.name;
-            document.getElementById('roomDisplay').textContent = currentRoom.split('-')[1].toUpperCase();
-        }
-
-        function updateLeaderboard() {
-            const allPlayers = [
-                {
-                    id: playerId,
-                    name: player.name || 'You',
-                    mass: player.mass,
-                    bankedScore: player.bankedScore,
-                    isSelf: true
-                },
-                ...Object.keys(otherPlayers).map(id => {
-                    const op = otherPlayers[id];
-                    return {
-                        id,
-                        name: op.name || 'Player',
-                        mass: op.mass,
-                        bankedScore: op.bankedScore || 0,
-                        isSelf: false
-                    };
-                })
-            ];
-
-            // Sort ONLY by banked score
-            allPlayers.sort((a, b) => b.bankedScore - a.bankedScore);
-
-            const leaderboardHtml = allPlayers.slice(0, 10).map((p, index) => {
-                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : (index + 1) + '.';
-                const selfHighlight = p.isSelf ? 'style="color:#facc15;font-weight:bold;"' : '';
-                return `
-                <div class="leaderboard-entry">
-                    <span class="name" ${selfHighlight}>${medal} ${p.name}</span>
-                    <span class="stats">
-                        <span style="color:#34d399;">${Math.floor(p.mass)}</span>
-                        <span style="color:#facc15;">💰${p.bankedScore}</span>
-                    </span>
-                </div>`;
-            }).join('');
-
-            document.getElementById('leaderboardList').innerHTML = leaderboardHtml;
-        }
-
-        function updatePlayerCount() {
-            const count = Object.keys(otherPlayers).length + 1;
-            document.getElementById('playerCount').textContent = `Players in room: ${count}`;
-        }
-
-        function drawMinimap() {
-            minimapCtx.clearRect(0, 0, minimapCanvas.width, minimapCanvas.height);
-
-            minimapCtx.strokeStyle = '#38bdf8';
-            minimapCtx.lineWidth = 2;
-            minimapCtx.strokeRect(0, 0, minimapCanvas.width, minimapCanvas.height);
-
-            const scaleX = minimapCanvas.width / CONFIG.WORLD_WIDTH;
-            const scaleY = minimapCanvas.height / CONFIG.WORLD_HEIGHT;
-
-            SAFE_ZONES.forEach(zone => {
-                const x = zone.x * scaleX;
-                const y = zone.y * scaleY;
-                const r = CONFIG.SAFE_ZONE_SIZE * scaleX;
-                minimapCtx.fillStyle = 'rgba(34,197,94,0.4)';
-                minimapCtx.beginPath();
-                minimapCtx.arc(x, y, r, 0, Math.PI * 2);
-                minimapCtx.fill();
-                minimapCtx.strokeStyle = 'rgba(34,197,94,0.8)';
-                minimapCtx.lineWidth = 1;
-                minimapCtx.beginPath();
-                minimapCtx.arc(x, y, r, 0, Math.PI * 2);
-                minimapCtx.stroke();
-            });
-
-            food.forEach(f => {
-                const x = f.x * scaleX;
-                const y = f.y * scaleY;
-                minimapCtx.fillStyle = '#facc15';
-                minimapCtx.fillRect(x - 1, y - 1, 2, 2);
-            });
-
-            Object.values(otherPlayers).forEach(p => {
-                const x = p.x * scaleX;
-                const y = p.y * scaleY;
-                minimapCtx.fillStyle = p.inSafeZone ? '#22c55e' : '#3b82f6';
-                minimapCtx.beginPath();
-                minimapCtx.arc(x, y, 4, 0, Math.PI * 2);
-                minimapCtx.fill();
-            });
-
-            const px = player.x * scaleX;
-            const py = player.y * scaleY;
-            minimapCtx.fillStyle = '#f97316';
-            minimapCtx.beginPath();
-            minimapCtx.arc(px, py, 5, 0, Math.PI * 2);
-            minimapCtx.fill();
-        }
-
-        // ===================================================================
-        // COLLISIONS
-        // ===================================================================
-        function checkCollisions() {
-            // Player with food
-            for (let i = food.length - 1; i >= 0; i--) {
-                const f = food[i];
-                const dx = player.x - f.x;
-                const dy = player.y - f.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < player.radius + f.radius) {
-                    player.mass = clampMass(player.mass + f.mass);
-                    food.splice(i, 1);
-                }
-            }
-            generateFood();
-
-            // Player with other players
-            Object.keys(otherPlayers).forEach(id => {
-                const op = otherPlayers[id];
-                const dx = player.x - op.x;
-                const dy = player.y - op.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < player.radius + op.radius) {
-                    if (player.canEat(op)) {
-                        player.eat(op);
-                        if (firebaseEnabled) {
-                            logDeath(id, player.name || 'You');
-                            database.ref('rooms/' + currentRoom + '/players/' + id).remove();
-                        }
-                        delete otherPlayers[id];
-                        addMessage(`You ate ${op.name || 'a player'}!`);
-                        speakText(`You ate ${op.name || 'a player'}!`);
-                    } else if (op.canEat(player)) {
-                        if (firebaseEnabled) {
-                            logDeath(playerId, op.name || 'A player');
-                        }
-                        showDeathScreen(op.name || 'another player');
-                    }
-                }
-            });
-        }
-
-        function showDeathScreen(killerName) {
-            gameStarted = false;
-            document.getElementById('deathMessage').textContent =
-                `${getTranslation('death')} (${killerName})`;
-            document.getElementById('deathOverlay').style.display = 'flex';
-            speakText(`${getTranslation('death')} by ${killerName}`);
-        }
-
-        function respawnPlayer() {
-            const startPos = getRandomSafeZonePosition();
-            player.x = startPos.x;
-            player.y = startPos.y;
-            player.mass = clampMass(CONFIG.INITIAL_MASS);
-            lastMass = player.mass;
-
-            inSafeZone = false;
-            safeZoneEnterTime = 0;
-            currentSafeZone = null;
-            document.getElementById('safeZoneTimer').textContent = '';
-
-            document.getElementById('deathOverlay').style.display = 'none';
-            gameStarted = true;
-        }
-
-        function getRandomSafeZonePosition() {
-            const zoneIndex = Math.floor(Math.random() * SAFE_ZONES.length);
-            const zone = SAFE_ZONES[zoneIndex];
-            const angle = Math.random() * Math.PI * 2;
-            const distance = Math.random() * 50;
-            return {
-                x: zone.x + Math.cos(angle) * distance,
-                y: zone.y + Math.sin(angle) * distance
-            };
-        }
-
-        // ===================================================================
-        // QUIZ SYSTEM
-        // ===================================================================
-        const mesoQuestions = [
+        const MESO_QUESTIONS = [
             {
-                text: "Which two rivers surrounded Mesopotamia?",
-                choices: {
-                    A: "Nile and Congo",
-                    B: "Tigris and Euphrates",
-                    C: "Amazon and Mississippi",
-                    D: "Yellow and Yangtze"
-                },
-                correct: "B",
-                difficulty: 1
+                id: 1,
+                text: "After Hammurabi's death, which northern Mesopotamian people later united the region again?",
+                choices: { A: "Egyptians", B: "Assyrians", C: "Greeks", D: "Phoenicians" },
+                correct: "B"
             },
             {
-                text: "Which empire built a famous library at Nineveh?",
-                choices: {
-                    A: "Sumerian",
-                    B: "Akkadian",
-                    C: "Assyrian",
-                    D: "Persian"
-                },
-                correct: "C",
-                difficulty: 2
+                id: 2,
+                text: "What helped Assyria become a powerful military state?",
+                choices: { A: "A huge navy", B: "Camels for desert travel", C: "Iron weapons and cavalry", D: "Stone city walls" },
+                correct: "C"
             },
             {
-                text: "Who built the Royal Road and used satraps to rule the empire?",
-                choices: {
-                    A: "Hammurabi",
-                    B: "Nebuchadnezzar II",
-                    C: "Ashurbanipal",
-                    D: "Darius I"
-                },
-                correct: "D",
-                difficulty: 2
+                id: 3,
+                text: "What is cavalry?",
+                choices: { A: "Soldiers who fight on foot", B: "Soldiers who fight while riding horses", C: "Soldiers who guard temples", D: "Soldiers who control boats" },
+                correct: "B"
             },
             {
-                text: "What was the name of the first written law code in Mesopotamia?",
-                choices: {
-                    A: "The Ten Commandments",
-                    B: "Code of Hammurabi",
-                    C: "Twelve Tables",
-                    D: "Magna Carta"
-                },
-                correct: "B",
-                difficulty: 1
+                id: 4,
+                text: "How did the Assyrians organize their huge empire?",
+                choices: { A: "Each city ruled itself with no control", B: "They divided it into provinces with governors", C: "They had only one giant city", D: "They used democracy everywhere" },
+                correct: "B"
             },
             {
-                text: "Which empire is known for its policy of tolerating conquered peoples' religions?",
-                choices: {
-                    A: "Assyrian Empire",
-                    B: "Persian Empire",
-                    C: "Babylonian Empire",
-                    D: "Hittite Empire"
-                },
-                correct: "B",
-                difficulty: 3
+                id: 5,
+                text: "Which city did Ashurbanipal make his capital?",
+                choices: { A: "Babylon", B: "Persepolis", C: "Nineveh", D: "Jerusalem" },
+                correct: "C"
+            },
+            {
+                id: 6,
+                text: "What was special about Ashurbanipal's library at Nineveh?",
+                choices: { A: "It stored only farming tools", B: "It held thousands of cuneiform tablets", C: "It was built underwater", D: "It was only for soldiers" },
+                correct: "B"
+            },
+            {
+                id: 7,
+                text: "Nebuchadnezzar II was king of which empire?",
+                choices: { A: "Old Babylonian", B: "Neo-Babylonian", C: "Egyptian", D: "Persian" },
+                correct: "B"
+            },
+            {
+                id: 8,
+                text: "Which famous project is Nebuchadnezzar II best known for?",
+                choices: { A: "The Great Pyramids", B: "The Great Wall", C: "The Hanging Gardens of Babylon", D: "The Lighthouse of Alexandria" },
+                correct: "C"
+            },
+            {
+                id: 9,
+                text: "Cyrus the Great first won an empire by defeating which people?",
+                choices: { A: "The Medes", B: "The Egyptians", C: "The Greeks", D: "The Romans" },
+                correct: "A"
+            },
+            {
+                id: 10,
+                text: "What is a standing army?",
+                choices: { A: "Soldiers who only fight in summer", B: "A permanent, professional army", C: "Farmers who fight when needed", D: "An army made only of nobles" },
+                correct: "B"
+            },
+            {
+                id: 11,
+                text: "The Persian 'Immortals' were:",
+                choices: { A: "A group of gods", B: "Elite soldiers in a 10,000-man unit", C: "A royal family", D: "A group of priests" },
+                correct: "B"
+            },
+            {
+                id: 12,
+                text: "How did Cyrus treat conquered peoples like the Babylonians and Jews?",
+                choices: { A: "Destroyed their temples", B: "Forced only Persian customs", C: "Allowed their religions and customs", D: "Made them leave their homelands" },
+                correct: "C"
+            },
+            {
+                id: 13,
+                text: "Which Persian ruler expanded the empire and built the Great Royal Road?",
+                choices: { A: "Sargon", B: "Nebuchadnezzar II", C: "Darius the Great", D: "Ashurbanipal" },
+                correct: "C"
+            },
+            {
+                id: 14,
+                text: "What was tribute in the Persian empire?",
+                choices: { A: "A type of coin", B: "Payment to show loyalty to a stronger power", C: "A law code", D: "A royal road" },
+                correct: "B"
+            },
+            {
+                id: 15,
+                text: "How did Darius make trade easier across the Persian empire?",
+                choices: { A: "Banned all foreign goods", B: "Forced everyone to barter", C: "Created a common currency of gold coins", D: "Closed the Great Royal Road" },
+                correct: "C"
+            },
+            {
+                id: 16,
+                text: "What did the Great Royal Road connect?",
+                choices: { A: "Rome and Athens", B: "Nineveh and Jerusalem", C: "Susa and Sardis (and other parts of the empire)", D: "Babylon and the Nile delta" },
+                correct: "C"
+            },
+            {
+                id: 17,
+                text: "What is the main idea of Zoroastrianism?",
+                choices: { A: "Thousands of equal gods", B: "Universe is a struggle between good and evil", C: "Ignore right and wrong", D: "Only kings reach the afterlife" },
+                correct: "B"
+            },
+            {
+                id: 18,
+                text: "What is the name of the Zoroastrian sacred text?",
+                choices: { A: "The Torah", B: "The Bible", C: "The Avesta", D: "The Epic of Gilgamesh" },
+                correct: "C"
+            },
+            {
+                id: 19,
+                text: "How did Darius balance local self-government with central power?",
+                choices: { A: "Ruled every village personally", B: "Banned all local traditions", C: "Provinces with local leaders under central control", D: "Let the army decide everything" },
+                correct: "C"
+            },
+            {
+                id: 20,
+                text: "Why are the Assyrian and Persian empires important in Mesopotamian history?",
+                choices: { A: "They ended writing and trade", B: "They united regions and spread new ideas", C: "They stayed small and isolated", D: "They used no armies at all" },
+                correct: "B"
             }
         ];
 
-        let mesoCurrentQuestion = null;
+        let mesoUsedIds = [];
         let mesoOverlayVisible = false;
+        let mesoCurrentQuestion = null;
+        let quizInterval = null;
 
         function mesoPickQuestion() {
-            return mesoQuestions[Math.floor(Math.random() * mesoQuestions.length)];
+            if (mesoUsedIds.length === MESO_QUESTIONS.length) {
+                mesoUsedIds = [];
+            }
+            const remaining = MESO_QUESTIONS.filter(q => !mesoUsedIds.includes(q.id));
+            const q = remaining[Math.floor(Math.random() * remaining.length)];
+            mesoUsedIds.push(q.id);
+            return q;
         }
 
-        function mesoLogAnswer(question, chosen, isCorrect) {
+        function mesoLogAnswer(question, label, isCorrect) {
             if (!mesoDb) return;
+
             const record = {
-                playerId,
-                playerName,
-                room: currentRoom,
+                name: playerName || "Anonymous",
+                game: "Cell Battle - Mesopotamia Edition",
+                topic: "Assyrian & Persian Empires (Lesson 2.3)",
+                room: currentRoom || "unknown",
+                questionId: question.id,
                 questionText: question.text,
-                correctAnswer: question.correct,
-                chosenAnswer: chosen,
-                difficulty: question.difficulty,
-                wasCorrect: isCorrect,
-                deltaMass: isCorrect ? +10 : -10,
+                correctChoice: question.correct,
+                chosenChoice: label,
+                correct: !!isCorrect,
+                massChange: isCorrect ? +10 : -10,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };
+
             mesoDb.collection("mesopotamia_scores").add(record).catch(err => {
                 console.error("Error logging quiz answer:", err);
             });
@@ -1339,23 +662,25 @@
         function mesoShowQuestion() {
             if (mesoOverlayVisible || !gameStarted || !player) return;
 
+            // Pause the game
             const wasPlaying = gameStarted;
             gameStarted = false;
 
             const q = mesoPickQuestion();
             mesoCurrentQuestion = q;
 
+            // Create overlay
             const overlay = document.createElement("div");
             overlay.id = "mesoQuizOverlay";
             Object.assign(overlay.style, {
                 position: "fixed",
                 inset: "0",
-                background: "rgba(15, 23, 42, 0.92)",
+                background: "rgba(0,0,0,0.85)",
                 display: "flex",
+                zIndex: "9999",
                 justifyContent: "center",
                 alignItems: "center",
-                fontFamily: "Arial, sans-serif",
-                zIndex: "2000"
+                fontFamily: "Arial, sans-serif"
             });
 
             const card = document.createElement("div");
@@ -1430,76 +755,820 @@
                 btn.onclick = () => {
                     const isCorrect = (label === q.correct);
 
+                    // Update player mass
                     if (isCorrect) {
-                        player.mass = clampMass(player.mass + 10);
+                        player.mass += 10;
                         feedbackEl.textContent = "✅ Correct! +10 Mass";
                         feedbackEl.style.color = "#22c55e";
                         speakText("Correct! You gained 10 mass!");
                     } else {
-                        player.mass = clampMass(player.mass - 10);
+                        player.mass = Math.max(CONFIG.MIN_MASS, player.mass - 10);
                         feedbackEl.textContent = `❌ Incorrect! -10 Mass. Answer: ${q.correct}. ${q.choices[q.correct]}`;
                         feedbackEl.style.color = "#f87171";
                         speakText("Incorrect. You lost 10 mass.");
                     }
 
+                    // Log to Firestore
                     mesoLogAnswer(q, label, isCorrect);
 
+                    // Disable all buttons
                     const allButtons = choicesEl.querySelectorAll("button");
                     allButtons.forEach(b => {
                         b.disabled = true;
                         b.style.opacity = "0.5";
+                        b.style.cursor = "not-allowed";
                     });
 
+                    // Highlight correct answer
+                    allButtons.forEach(b => {
+                        if (b.textContent.startsWith(q.correct + ".")) {
+                            b.style.background = "#22c55e";
+                            b.style.border = "2px solid #16a34a";
+                        }
+                    });
+
+                    // Close after 3 seconds
                     setTimeout(() => {
                         document.body.removeChild(overlay);
                         mesoOverlayVisible = false;
+                        gameStarted = wasPlaying;
+                        // Restart game loop if it was running
                         if (wasPlaying) {
-                            gameStarted = true;
+                            lastUpdate = Date.now();
+                            gameLoop();
                         }
-                    }, 1500);
+                    }, 3000);
                 };
 
                 choicesEl.appendChild(btn);
             });
-
-            const closeBtn = document.createElement("button");
-            closeBtn.textContent = "Skip";
-            Object.assign(closeBtn.style, {
-                marginTop: "10px",
-                padding: "8px 16px",
-                borderRadius: "9999px",
-                border: "none",
-                background: "#f97316",
-                color: "#111827",
-                fontWeight: "bold",
-                cursor: "pointer",
-                display: "block",
-                marginLeft: "auto",
-                marginRight: "auto"
-            });
-            closeBtn.onclick = () => {
-                document.body.removeChild(overlay);
-                mesoOverlayVisible = false;
-                if (wasPlaying) {
-                    gameStarted = true;
-                }
-            };
 
             card.appendChild(title);
             card.appendChild(subtitle);
             card.appendChild(questionEl);
             card.appendChild(choicesEl);
             card.appendChild(feedbackEl);
-            card.appendChild(closeBtn);
-
             overlay.appendChild(card);
             document.body.appendChild(overlay);
+
             mesoOverlayVisible = true;
         }
 
         // ===================================================================
-        // MAIN GAME LOOP
+        // ACCESSIBILITY FEATURES
         // ===================================================================
+        let ttsEnabled = true;
+        let currentLanguage = 'en';
+        let speechRate = 1.0;
+
+        const translations = {
+            en: {
+                instructions: "Move your mouse or trackpad, or use the arrow keys / W A S D to control your cell. Eat food and smaller cells to grow. Press space to bank half your mass in safe zones. Leaderboard is based on banked points.",
+                gameStatus: "Your current mass is {mass}. Your banked score is {banked}. You are rank {rank} out of {total} players (by banked).",
+                leaderboard: "The top three players by banked score are: {leaders}",
+                eaten: "Oh no! You were eaten. Respawning...",
+                atePlayer: "Great job! You ate another player!",
+                split: "You banked half your mass!"
+            },
+            es: {
+                instructions: "Mueve el ratón o panel táctil, o usa las flechas / W A S D para controlar tu célula. Come comida y células más pequeñas para crecer. Pulsa espacio para guardar la mitad de tu masa en zonas seguras. La clasificación usa puntos guardados.",
+                gameStatus: "Tu masa actual es {mass}. Tu puntuación guardada es {banked}. Estás en el puesto {rank} de {total} jugadores (por puntos guardados).",
+                leaderboard: "Los tres mejores jugadores por puntos guardados son: {leaders}",
+                eaten: "¡Oh no! Te comieron. Reapareciendo...",
+                atePlayer: "¡Buen trabajo! ¡Comiste a otro jugador!",
+                split: "¡Guardaste la mitad de tu masa!"
+            },
+            fr: {
+                instructions: "Déplacez votre souris ou pavé tactile, ou utilisez les flèches / W A S D pour contrôler votre cellule. Mangez de la nourriture et des cellules plus petites pour grandir. Appuyez sur espace pour mettre en banque la moitié de votre masse dans les zones sûres. Le classement est basé sur les points en banque.",
+                gameStatus: "Votre masse actuelle est {mass}. Votre score en banque est {banked}. Vous êtes classé {rank} sur {total} joueurs (par points en banque).",
+                leaderboard: "Les trois meilleurs joueurs par points en banque sont : {leaders}",
+                eaten: "Oh non ! Vous avez été mangé. Réapparition...",
+                atePlayer: "Bon travail ! Vous avez mangé un autre joueur !",
+                split: "Vous avez mis en banque la moitié de votre masse !"
+            },
+            zh: {
+                instructions: "使用鼠标或触控板，或使用方向键 / W A S D 控制你的细胞。吃食物和更小的细胞来成长。在安全区按空格键可把一半质量存入银行。排行榜按存入分数排序。",
+                gameStatus: "你目前的质量是 {mass}。你存入的得分是 {banked}。在按存入分数排名的 {total} 名玩家中，你排第 {rank}。",
+                leaderboard: "按存入分数排名的前三名玩家是：{leaders}",
+                eaten: "哦不！你被吃掉了。正在重生……",
+                atePlayer: "干得好！你吃掉了另一个玩家！",
+                split: "你存入了一半的质量！"
+            },
+            ar: {
+                instructions: "حرك الماوس أو لوحة اللمس، أو استخدم الأسهم / W A S D للتحكم في خليتك. كل الطعام والخلايا الأصغر لتنمو. اضغط على المسافة في المناطق الآمنة لتخزين نصف كتلتك. لوحة الصدارة تعتمد على النقاط المخزنة.",
+                gameStatus: "كتلتك الحالية هي {mass}. نقاطك المخزنة هي {banked}. ترتيبك {rank} من {total} لاعب (حسب النقاط المخزنة).",
+                leaderboard: "أعلى ثلاثة لاعبين حسب النقاط المخزنة هم: {leaders}",
+                eaten: "يا لا! تم أكلك. إعادة الظهور...",
+                atePlayer: "عمل رائع! لقد أكلت لاعبًا آخر!",
+                split: "لقد خزنت نصف كتلتك!"
+            },
+            pt: {
+                instructions: "Mova o mouse ou trackpad, ou use as setas / W A S D para controlar sua célula. Coma comida e células menores para crescer. Pressione espaço nas zonas seguras para guardar metade da massa no banco. O placar é baseado no valor bancado.",
+                gameStatus: "Sua massa atual é {mass}. Seu valor bancado é {banked}. Você está em {rank}º de {total} jogadores (por valor bancado).",
+                leaderboard: "Os três melhores jogadores por valor bancado são: {leaders}",
+                eaten: "Oh não! Você foi comido. Reaparecendo...",
+                atePlayer: "Bom trabalho! Você comeu outro jogador!",
+                split: "Você bancou metade da sua massa!"
+            }
+        };
+
+        function speakText(text, interrupt = false) {
+            if (!ttsEnabled && !interrupt) return;
+            
+            if ('speechSynthesis' in window) {
+                if (interrupt) {
+                    window.speechSynthesis.cancel();
+                }
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = speechRate;
+                utterance.lang = getLanguageCode(currentLanguage);
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function getLanguageCode(lang) {
+            const codes = {
+                'en': 'en-US',
+                'es': 'es-ES',
+                'fr': 'fr-FR',
+                'zh': 'zh-CN',
+                'ar': 'ar-SA',
+                'pt': 'pt-BR'
+            };
+            return codes[lang] || 'en-US';
+        }
+
+        function getTranslation(key, replacements = {}) {
+            let text = translations[currentLanguage][key] || translations['en'][key];
+            Object.keys(replacements).forEach(k => {
+                text = text.replace(`{${k}}`, replacements[k]);
+            });
+            return text;
+        }
+
+        function speakGameStatus() {
+            if (!player) return;
+            const allPlayers = [
+                { name: player.name, bankedScore: player.bankedScore },
+                ...Object.values(otherPlayers).map(p => ({ name: p.name, bankedScore: p.bankedScore || 0 }))
+            ].sort((a, b) => b.bankedScore - a.bankedScore);
+
+            const rank = allPlayers.findIndex(p => p.name === player.name) + 1;
+            const text = getTranslation('gameStatus', {
+                mass: Math.floor(player.mass),
+                banked: Math.floor(player.bankedScore),
+                rank: rank || '-',
+                total: allPlayers.length
+            });
+            speakText(text, true);
+        }
+
+        function speakLeaderboard() {
+            const allPlayers = [
+                { name: player.name, bankedScore: player.bankedScore },
+                ...Object.values(otherPlayers).map(p => ({ name: p.name, bankedScore: p.bankedScore || 0 }))
+            ].sort((a, b) => b.bankedScore - a.bankedScore).slice(0, 3);
+
+            const leaders = allPlayers.map((p, i) => `${i+1}. ${p.name} with ${Math.floor(p.bankedScore)} banked`).join(', ');
+            const text = getTranslation('leaderboard', { leaders });
+            speakText(text, true);
+        }
+
+        function toggleAccessibilityHelp() {
+            const helpText = getTranslation('instructions');
+            speakText(helpText, true);
+        }
+
+        // Accessibility controls
+        document.getElementById('dyslexiaFont').addEventListener('change', (e) => {
+            document.body.classList.toggle('dyslexia-font', e.target.checked);
+            speakText('Easy-read font ' + (e.target.checked ? 'enabled' : 'disabled'));
+        });
+
+        document.getElementById('highContrast').addEventListener('change', (e) => {
+            document.body.classList.toggle('high-contrast', e.target.checked);
+            speakText('High contrast colors ' + (e.target.checked ? 'enabled' : 'disabled'));
+        });
+
+        document.getElementById('textToSpeech').addEventListener('change', (e) => {
+            ttsEnabled = e.target.checked;
+            speakText('Read aloud ' + (e.target.checked ? 'enabled' : 'disabled'), true);
+        });
+
+        document.getElementById('largerText').addEventListener('change', (e) => {
+            document.body.style.fontSize = e.target.checked ? '1.5em' : '1em';
+            speakText('Bigger text ' + (e.target.checked ? 'enabled' : 'disabled'));
+        });
+
+        document.getElementById('languageSelect').addEventListener('change', (e) => {
+            currentLanguage = e.target.value;
+            speakText('Language changed');
+        });
+
+        document.getElementById('speechRate').addEventListener('change', (e) => {
+            speechRate = parseFloat(e.target.value);
+            speakText('Voice speed changed');
+        });
+
+        document.getElementById('readInstructions').addEventListener('click', () => {
+            const helpText = getTranslation('instructions');
+            speakText(helpText, true);
+        });
+
+        // ===================================================================
+        // GAME CONFIGURATION
+        // ===================================================================
+        const CONFIG = {
+            WORLD_WIDTH: 3000,
+            WORLD_HEIGHT: 3000,
+            INITIAL_MASS: 10,
+            MAX_MASS: 300,  // Maximum cell size to keep game playable
+            FOOD_MASS: 1,
+            MAX_FOOD: 300,
+            FOOD_SIZE: 5,
+            MIN_SPLIT_MASS: 20,  // Reduced from 30 to allow banking sooner
+            SPLIT_SPEED: 15,
+            SPEED_MULTIPLIER: 12,  // Slightly boosted and adjusted formula so big cells are faster than before
+            MASS_LOSS_RATE: 0.002,
+            MIN_MASS: 10,
+            SAFE_ZONE_SIZE: 400,
+            SAFE_ZONE_TIME: 15000, // 15 seconds in milliseconds
+        };
+
+        // Safe zones in corners
+        const SAFE_ZONES = [
+            { x: 200, y: 200, label: 'Top Left' },
+            { x: CONFIG.WORLD_WIDTH - 200, y: 200, label: 'Top Right' },
+            { x: 200, y: CONFIG.WORLD_HEIGHT - 200, label: 'Bottom Left' },
+            { x: CONFIG.WORLD_WIDTH - 200, y: CONFIG.WORLD_HEIGHT - 200, label: 'Bottom Right' }
+        ];
+
+        // ===================================================================
+        // GAME STATE
+        // ===================================================================
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const minimapCanvas = document.getElementById('minimap');
+        const minimapCtx = minimapCanvas.getContext('2d');
+
+        let gameStarted = false;
+        let playerId = null;
+        let playerName = '';
+        let currentRoom = 'room-a';
+        let player = null;
+        let otherPlayers = {};
+        let food = [];
+        let camera = { x: 0, y: 0 };
+        let mouse = { x: 0, y: 0 };
+        let lastUpdate = Date.now();
+        let lastMass = 0;
+        let inSafeZone = false;
+        let safeZoneEnterTime = 0;
+        let currentSafeZone = null;
+
+        // NEW: keyboard movement state
+        const keys = {
+            ArrowUp: false,
+            ArrowDown: false,
+            ArrowLeft: false,
+            ArrowRight: false,
+            KeyW: false,
+            KeyA: false,
+            KeyS: false,
+            KeyD: false
+        };
+        const MOVE_KEYS = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyW','KeyA','KeyS','KeyD'];
+
+        // ===================================================================
+        // UTILITY FUNCTIONS
+        // ===================================================================
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function generateId() {
+            return 'player_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function randomColor() {
+            const colors = [
+                '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', 
+                '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2',
+                '#F8B739', '#52B788'
+            ];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        function getRandomPosition() {
+            return {
+                x: Math.random() * CONFIG.WORLD_WIDTH,
+                y: Math.random() * CONFIG.WORLD_HEIGHT
+            };
+        }
+
+        function distance(p1, p2) {
+            const dx = p1.x - p2.x;
+            const dy = p1.y - p2.y;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        function checkCollision(cell1, cell2) {
+            const dist = distance(cell1, cell2);
+            return dist < (cell1.radius + cell2.radius);
+        }
+
+        function isInSafeZone(x, y) {
+            for (let zone of SAFE_ZONES) {
+                const dist = Math.sqrt((x - zone.x) ** 2 + (y - zone.y) ** 2);
+                if (dist < CONFIG.SAFE_ZONE_SIZE / 2) {
+                    return zone;
+                }
+            }
+            return null;
+        }
+
+        function checkSafeZoneStatus() {
+            const zone = isInSafeZone(player.x, player.y);
+            
+            if (zone && !inSafeZone) {
+                // Just entered safe zone
+                inSafeZone = true;
+                safeZoneEnterTime = Date.now();
+                currentSafeZone = zone;
+                speakText(`Entered safe zone! You have 15 seconds.`);
+            } else if (!zone && inSafeZone) {
+                // Just left safe zone
+                inSafeZone = false;
+                currentSafeZone = null;
+            } else if (zone && inSafeZone) {
+                // Still in safe zone - check timer
+                const timeInZone = Date.now() - safeZoneEnterTime;
+                if (timeInZone >= CONFIG.SAFE_ZONE_TIME) {
+                    // Time's up! Eject player
+                    ejectFromSafeZone(zone);
+                }
+            }
+        }
+
+        function ejectFromSafeZone(zone) {
+            // Push player away from zone center
+            const angle = Math.random() * Math.PI * 2;
+            const ejectDistance = CONFIG.SAFE_ZONE_SIZE / 2 + 100;
+            
+            player.x = zone.x + Math.cos(angle) * ejectDistance;
+            player.y = zone.y + Math.sin(angle) * ejectDistance;
+            
+            // Keep in bounds
+            player.x = Math.max(player.radius, Math.min(CONFIG.WORLD_WIDTH - player.radius, player.x));
+            player.y = Math.max(player.radius, Math.min(CONFIG.WORLD_HEIGHT - player.radius, player.y));
+            
+            inSafeZone = false;
+            currentSafeZone = null;
+            speakText(`Time's up! Ejected from safe zone!`);
+        }
+
+        // ===================================================================
+        // CELL CLASS
+        // ===================================================================
+        class Cell {
+            constructor(x, y, mass, color, name = '') {
+                this.x = x;
+                this.y = y;
+                this.mass = mass;
+                this.color = color;
+                this.name = name;
+                this.vx = 0;
+                this.vy = 0;
+                this.bankedScore = 0;  // Permanent banked points
+            }
+
+            get radius() {
+                return Math.sqrt(this.mass) * 4.5;
+            }
+
+            get speed() {
+                // Make large cells not crawl: reduce the slowdown curve and add a small base
+                const m = Math.max(this.mass, CONFIG.INITIAL_MASS);
+                const base = CONFIG.SPEED_MULTIPLIER / Math.pow(m, 0.4);
+                return base + 1.5;
+            }
+
+            move(targetX, targetY) {
+                const dx = targetX - this.x;
+                const dy = targetY - this.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist > 10) {
+                    this.vx = (dx / dist) * this.speed;
+                    this.vy = (dy / dist) * this.speed;
+                    
+                    this.x += this.vx;
+                    this.y += this.vy;
+
+                    this.x = Math.max(this.radius, Math.min(CONFIG.WORLD_WIDTH - this.radius, this.x));
+                    this.y = Math.max(this.radius, Math.min(CONFIG.WORLD_HEIGHT - this.radius, this.y));
+                }
+
+                // Enforce max mass
+                if (this.mass > CONFIG.MAX_MASS) {
+                    this.mass = CONFIG.MAX_MASS;
+                }
+
+                if (this.mass > CONFIG.MIN_MASS) {
+                    this.mass -= CONFIG.MASS_LOSS_RATE;
+                }
+            }
+
+            draw(ctx, camX, camY) {
+                const screenX = this.x - camX;
+                const screenY = this.y - camY;
+
+                // Draw shield if in safe zone
+                if (this.inSafeZone) {
+                    const pulse = Math.sin(Date.now() / 300) * 0.2 + 0.8;
+                    ctx.strokeStyle = 'rgba(0, 255, 100, ' + pulse + ')';
+                    ctx.lineWidth = 5;
+                    ctx.beginPath();
+                    ctx.arc(screenX, screenY, this.radius + 10, 0, Math.PI * 2);
+                    ctx.stroke();
+                    
+                    // Shield icon
+                    ctx.fillStyle = 'rgba(0, 255, 100, ' + pulse + ')';
+                    ctx.font = '20px Arial';
+                    ctx.fillText('🛡️', screenX + this.radius - 10, screenY - this.radius + 10);
+                }
+
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(screenX, screenY, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                if (this.name) {
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 16px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(this.name, screenX, screenY - 5);
+                    ctx.font = '14px Arial';
+                    ctx.fillText(Math.floor(this.mass), screenX, screenY + 15);
+                }
+            }
+
+            canEat(otherCell) {
+                return this.mass > otherCell.mass * 1.2;
+            }
+
+            eat(otherCell) {
+                this.mass += otherCell.mass;
+                if (this.mass > CONFIG.MAX_MASS) {
+                    this.mass = CONFIG.MAX_MASS;
+                }
+            }
+
+            split() {
+                // BANKING SYSTEM: Press SPACE to bank half your mass
+                if (this.mass < CONFIG.MIN_SPLIT_MASS) return null;
+                
+                const bankAmount = Math.floor(this.mass / 2);
+                this.mass -= bankAmount;
+                this.bankedScore += bankAmount;
+                
+                // Show notification
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: rgba(255, 215, 0, 0.95);
+                    color: #000;
+                    padding: 30px 50px;
+                    border-radius: 20px;
+                    font-size: 2em;
+                    font-weight: bold;
+                    z-index: 10000;
+                    animation: popIn 0.5s;
+                `;
+                notification.textContent = `+${bankAmount} BANKED! 💰`;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 1500);
+                
+                return null; // Don't create a new cell
+            }
+        }
+
+        // ===================================================================
+        // FOOD & FIREBASE
+        // ===================================================================
+        function generateFood() {
+            while (food.length < CONFIG.MAX_FOOD) {
+                const pos = getRandomPosition();
+                food.push({
+                    id: 'food_' + Date.now() + '_' + Math.random(),
+                    x: pos.x, y: pos.y,
+                    radius: CONFIG.FOOD_SIZE,
+                    mass: CONFIG.FOOD_MASS,
+                    color: randomColor()
+                });
+            }
+        }
+
+        function drawFood() {
+            food.forEach(f => {
+                const screenX = f.x - camera.x;
+                const screenY = f.y - camera.y;
+                if (screenX > -50 && screenX < canvas.width + 50 &&
+                    screenY > -50 && screenY < canvas.height + 50) {
+                    ctx.fillStyle = f.color;
+                    ctx.beginPath();
+                    ctx.arc(screenX, screenY, f.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+        }
+
+        function syncPlayerToFirebase() {
+            if (!firebaseEnabled || !player) return;
+
+            database.ref('rooms/' + currentRoom + '/players/' + playerId).set({
+                id: playerId,
+                name: player.name,
+                x: player.x,
+                y: player.y,
+                mass: player.mass,
+                bankedScore: player.bankedScore,
+                color: player.color,
+                inSafeZone: inSafeZone,
+                lastUpdate: Date.now()
+            });
+        }
+
+        function sendPlayerDeath(victimId) {
+            if (!firebaseEnabled) return;
+            
+            // Send death signal to victim
+            database.ref('rooms/' + currentRoom + '/deaths/' + victimId).set({
+                killedBy: playerId,
+                killerName: player.name,
+                timestamp: Date.now()
+            });
+            
+            // Remove death signal after 1 second
+            setTimeout(() => {
+                database.ref('rooms/' + currentRoom + '/deaths/' + victimId).remove();
+            }, 1000);
+        }
+
+        function listenForDeath() {
+            if (!firebaseEnabled || !playerId) return;
+            
+            database.ref('rooms/' + currentRoom + '/deaths/' + playerId).on('value', (snapshot) => {
+                const deathData = snapshot.val();
+                if (deathData && gameStarted) {
+                    speakText(`Oh no! ${deathData.killerName} ate you!`);
+                    respawnPlayer();
+                }
+            });
+        }
+
+        function listenToOtherPlayers() {
+            if (!firebaseEnabled) return;
+            database.ref('rooms/' + currentRoom + '/players').on('value', (snapshot) => {
+                const players = snapshot.val();
+                otherPlayers = {};
+                if (players) {
+                    Object.keys(players).forEach(id => {
+                        if (id !== playerId) {
+                            const p = players[id];
+                            if (Date.now() - p.lastUpdate < 10000) {
+                                const cell = new Cell(p.x, p.y, p.mass, p.color, p.name);
+                                cell.inSafeZone = p.inSafeZone || false;
+                                cell.bankedScore = p.bankedScore || 0; // IMPORTANT: bring in their banked money
+                                otherPlayers[id] = cell;
+                            }
+                        }
+                    });
+                }
+                updatePlayerCount();
+            });
+        }
+
+        function removePlayerFromFirebase() {
+            if (!firebaseEnabled || !playerId) return;
+            database.ref('rooms/' + currentRoom + '/players/' + playerId).remove();
+        }
+
+        function checkCollisions() {
+            const beforeMass = player.mass;
+            
+            food = food.filter(f => {
+                if (checkCollision(player, f)) {
+                    player.eat(f);
+                    return false;
+                }
+                return true;
+            });
+
+            // Check collisions with other players
+            Object.keys(otherPlayers).forEach(id => {
+                const other = otherPlayers[id];
+                
+                // Skip collision if either player is in a safe zone
+                const playerInSafe = inSafeZone;
+                const otherInSafe = other.inSafeZone || false;
+                
+                if (playerInSafe || otherInSafe) {
+                    return; // Skip this collision
+                }
+                
+                if (checkCollision(player, other)) {
+                    if (player.canEat(other)) {
+                        // You ate them!
+                        player.eat(other);
+                        sendPlayerDeath(id); // Tell them they died
+                        speakText(getTranslation('atePlayer'));
+                    } else if (other.canEat(player)) {
+                        // They ate you!
+                        // Your death will be detected by listenForDeath
+                    }
+                }
+            });
+
+            // Announce significant growth
+            if (player.mass > beforeMass + 10) {
+                if (Math.floor(player.mass / 20) > Math.floor(lastMass / 20)) {
+                    speakText(`You reached ${Math.floor(player.mass / 20) * 20} mass!`);
+                }
+            }
+            lastMass = player.mass;
+
+            generateFood();
+        }
+
+        function updateCamera() {
+            camera.x = player.x - canvas.width / 2;
+            camera.y = player.y - canvas.height / 2;
+            camera.x = Math.max(0, Math.min(CONFIG.WORLD_WIDTH - canvas.width, camera.x));
+            camera.y = Math.max(0, Math.min(CONFIG.WORLD_HEIGHT - canvas.height, camera.y));
+        }
+
+        function drawGrid() {
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            const startX = Math.floor(camera.x / 50) * 50;
+            const startY = Math.floor(camera.y / 50) * 50;
+            for (let x = startX; x < camera.x + canvas.width; x += 50) {
+                ctx.beginPath();
+                ctx.moveTo(x - camera.x, 0);
+                ctx.lineTo(x - camera.x, canvas.height);
+                ctx.stroke();
+            }
+            for (let y = startY; y < camera.y + canvas.height; y += 50) {
+                ctx.beginPath();
+                ctx.moveTo(0, y - camera.y);
+                ctx.lineTo(canvas.width, y - camera.y);
+                ctx.stroke();
+            }
+        }
+
+        function drawWorldBorder() {
+            ctx.strokeStyle = '#ff4444';
+            ctx.lineWidth = 10;
+            ctx.strokeRect(-camera.x, -camera.y, CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT);
+        }
+
+        function drawSafeZones() {
+            SAFE_ZONES.forEach(zone => {
+                const screenX = zone.x - camera.x;
+                const screenY = zone.y - camera.y;
+                const radius = CONFIG.SAFE_ZONE_SIZE / 2;
+
+                // Draw pulsing safe zone
+                const pulse = Math.sin(Date.now() / 500) * 0.1 + 0.9;
+                
+                // Outer glow
+                ctx.fillStyle = 'rgba(0, 255, 100, ' + (0.1 * pulse) + ')';
+                ctx.beginPath();
+                ctx.arc(screenX, screenY, radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Border
+                ctx.strokeStyle = 'rgba(0, 255, 100, ' + (0.5 * pulse) + ')';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                // Label
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.font = 'bold 20px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('🛡️ SAFE ZONE', screenX, screenY - 10);
+                ctx.font = '14px Arial';
+                ctx.fillText('15 sec max', screenX, screenY + 10);
+            });
+
+            // Show timer if player is in safe zone
+            if (inSafeZone && currentSafeZone) {
+                const timeInZone = Date.now() - safeZoneEnterTime;
+                const timeLeft = Math.max(0, CONFIG.SAFE_ZONE_TIME - timeInZone);
+                const secondsLeft = Math.ceil(timeLeft / 1000);
+                
+                // Draw timer above player
+                const screenX = player.x - camera.x;
+                const screenY = player.y - camera.y - player.radius - 30;
+                
+                // Timer background
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(screenX - 50, screenY - 15, 100, 30);
+                
+                // Timer text
+                const warningColor = secondsLeft <= 5 ? '#ff4444' : '#00ff64';
+                ctx.fillStyle = warningColor;
+                ctx.font = 'bold 18px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`⏱️ ${secondsLeft}s`, screenX, screenY + 5);
+                
+                // Flash warning when low
+                if (secondsLeft <= 3 && Math.floor(Date.now() / 250) % 2 === 0) {
+                    ctx.fillStyle = 'rgba(255, 68, 68, 0.3)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+        }
+
+        function drawMinimap() {
+            const scale = 150 / CONFIG.WORLD_WIDTH;
+            minimapCtx.clearRect(0, 0, 150, 150);
+            minimapCtx.strokeStyle = '#667eea';
+            minimapCtx.strokeRect(0, 0, 150, 150);
+            minimapCtx.fillStyle = player.color;
+            minimapCtx.fillRect(player.x * scale - 2, player.y * scale - 2, 4, 4);
+            Object.values(otherPlayers).forEach(p => {
+                minimapCtx.fillStyle = p.color;
+                minimapCtx.fillRect(p.x * scale - 1, p.y * scale - 1, 2, 2);
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('playerMass').textContent = Math.floor(player.mass);
+            document.getElementById('bankedScore').textContent = Math.floor(player.bankedScore);
+            // Leaderboard score = banked only
+            const totalScore = Math.floor(player.bankedScore);
+            document.getElementById('totalScore').textContent = totalScore;
+            
+            const allPlayers = [
+                { name: player.name, bankedScore: player.bankedScore },
+                ...Object.values(otherPlayers).map(p => ({ 
+                    name: p.name, 
+                    bankedScore: p.bankedScore || 0
+                }))
+            ].sort((a, b) => b.bankedScore - a.bankedScore);
+            const rank = allPlayers.findIndex(p => p.name === player.name) + 1;
+            document.getElementById('playerRank').textContent = rank ? `#${rank}` : '-';
+        }
+
+        function updatePlayerCount() {
+            const count = 1 + Object.keys(otherPlayers).length;
+            document.getElementById('playerCount').textContent = count;
+        }
+
+        function updateLeaderboard() {
+            const allPlayers = [
+                { 
+                    name: player.name,
+                    mass: player.mass,
+                    bankedScore: player.bankedScore,
+                    isMe: true 
+                },
+                ...Object.values(otherPlayers).map(p => ({ 
+                    name: p.name, 
+                    mass: p.mass,
+                    bankedScore: p.bankedScore || 0,
+                    isMe: false 
+                }))
+            ].sort((a, b) => (b.bankedScore || 0) - (a.bankedScore || 0)).slice(0, 10);
+
+            const leaderboardHtml = allPlayers.map((p, i) => {
+                const className = p.isMe ? 'leaderboard-entry current-player' : 'leaderboard-entry';
+                return `<div class="${className}">
+                    <span>${i + 1}. ${p.name}</span>
+                    <span style="display: flex; gap: 8px; align-items: center;">
+                        <span style="color: #4CAF50;">${Math.floor(p.mass)}</span>
+                        <span style="color: #FFD700;">💰${Math.floor(p.bankedScore || 0)}</span>
+                    </span>
+                </div>`;
+            }).join('');
+            document.getElementById('leaderboardList').innerHTML = leaderboardHtml;
+        }
+
         function gameLoop() {
             if (!gameStarted) return;
             const now = Date.now();
@@ -1512,6 +1581,7 @@
             drawWorldBorder();
             drawSafeZones();
 
+            // Combined mouse + keyboard movement
             let targetX = mouse.x + camera.x;
             let targetY = mouse.y + camera.y;
 
@@ -1526,11 +1596,11 @@
                 if (down) dy += 1;
                 if (left) dx -= 1;
                 if (right) dx += 1;
-
                 const len = Math.hypot(dx, dy);
                 if (len > 0) {
                     dx /= len;
                     dy /= len;
+                    // Go far in that direction; Cell.move clamps speed
                     targetX = player.x + dx * 1000;
                     targetY = player.y + dy * 1000;
                 }
@@ -1553,38 +1623,126 @@
             requestAnimationFrame(gameLoop);
         }
 
-        // ===================================================================
-        // INPUT HANDLERS
-        // ===================================================================
+        function updateRoomCounts() {
+            if (!firebaseEnabled) return;
+            
+            const rooms = ['room-a', 'room-b', 'room-c', 'room-d'];
+            rooms.forEach(room => {
+                database.ref('rooms/' + room + '/players').once('value', (snapshot) => {
+                    const players = snapshot.val();
+                    let count = 0;
+                    if (players) {
+                        Object.keys(players).forEach(id => {
+                            const p = players[id];
+                            if (Date.now() - p.lastUpdate < 10000) {
+                                count++;
+                            }
+                        });
+                    }
+                    
+                    // Update the dropdown
+                    const roomLetter = room.split('-')[1].toUpperCase();
+                    const option = document.querySelector(`#roomSelect option[value="${room}"]`);
+                    if (option) {
+                        const emoji = option.textContent.split(' ')[0]; // Keep the emoji
+                        option.textContent = `${emoji} Room ${roomLetter} (Players: ${count})`;
+                    }
+                });
+            });
+        }
+
+        function startGame() {
+            playerName = document.getElementById('playerName').value.trim();
+            if (!playerName) {
+                alert('Please enter your name!');
+                speakText('Please enter your name!', true);
+                return;
+            }
+
+            currentRoom = document.getElementById('roomSelect').value;
+            const roomLetter = currentRoom.split('-')[1].toUpperCase();
+            
+            playerId = generateId();
+            const startPos = getRandomSafeZonePosition();
+            player = new Cell(startPos.x, startPos.y, CONFIG.INITIAL_MASS, randomColor(), playerName);
+            lastMass = player.mass;
+
+            document.getElementById('startMenu').classList.add('hidden');
+            document.getElementById('stats').classList.remove('hidden');
+            document.getElementById('leaderboard').classList.remove('hidden');
+            document.getElementById('minimap').classList.remove('hidden');
+            document.getElementById('gameAccessibility').classList.remove('hidden');
+
+            generateFood();
+            if (firebaseEnabled) {
+                listenToOtherPlayers();
+                listenForDeath();
+                syncPlayerToFirebase();
+            }
+
+            gameStarted = true;
+            lastUpdate = Date.now();
+            
+            // Start quiz timer - first question after 40 seconds, then every 40 seconds
+            if (quizInterval) clearInterval(quizInterval);
+            quizInterval = setInterval(() => {
+                if (gameStarted && !mesoOverlayVisible) {
+                    mesoShowQuestion();
+                }
+            }, 40000); // 40 seconds
+            
+            const welcomeText = getTranslation('instructions');
+            speakText(`Welcome ${playerName} to Room ${roomLetter}! You start in a safe zone. Answer Mesopotamia questions every 40 seconds to grow! ${welcomeText}`);
+            
+            gameLoop();
+        }
+
+        function getRandomSafeZonePosition() {
+            const zone = SAFE_ZONES[Math.floor(Math.random() * SAFE_ZONES.length)];
+            // Spawn near center of safe zone
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 50; // Within 50 units of center
+            return {
+                x: zone.x + Math.cos(angle) * distance,
+                y: zone.y + Math.sin(angle) * distance
+            };
+        }
+
+        function respawnPlayer() {
+            const startPos = getRandomSafeZonePosition();
+            player.x = startPos.x;
+            player.y = startPos.y;
+            player.mass = CONFIG.INITIAL_MASS;
+            lastMass = player.mass;
+            
+            // Reset safe zone timer
+            inSafeZone = false;
+            safeZoneEnterTime = 0;
+            currentSafeZone = null;
+        }
+
+        // Event listeners
+        window.addEventListener('resize', resizeCanvas);
         canvas.addEventListener('mousemove', (e) => {
             const rect = canvas.getBoundingClientRect();
             mouse.x = e.clientX - rect.left;
             mouse.y = e.clientY - rect.top;
         });
-
-        canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            const rect = canvas.getBoundingClientRect();
-            const touch = e.touches[0];
-            mouse.x = touch.clientX - rect.left;
-            mouse.y = touch.clientY - rect.top;
-        }, { passive: false });
-
         canvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
             const rect = canvas.getBoundingClientRect();
             const touch = e.touches[0];
             mouse.x = touch.clientX - rect.left;
             mouse.y = touch.clientY - rect.top;
-        }, { passive: false });
+        });
 
         document.addEventListener('keydown', (e) => {
-            if (!gameStarted) return;
-
-            if (e.code === 'Space') {
+            if (e.code === 'Space' && gameStarted) {
                 e.preventDefault();
                 const newCell = player.split();
                 if (newCell) {
+                    speakText(getTranslation('split'));
+                } else {
                     speakText(getTranslation('split'));
                 }
             }
@@ -1596,7 +1754,6 @@
         });
 
         document.addEventListener('keyup', (e) => {
-            if (!gameStarted) return;
             if (MOVE_KEYS.includes(e.code)) {
                 e.preventDefault();
                 keys[e.code] = false;
@@ -1604,122 +1761,27 @@
         });
 
         document.getElementById('startButton').addEventListener('click', startGame);
-        document.getElementById('respawnButton').addEventListener('click', () => {
-            respawnPlayer();
+        document.getElementById('playerName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') startGame();
         });
 
-        document.getElementById('roomSelect').addEventListener('change', (e) => {
-            const newRoom = e.target.value;
-            changeRoom(newRoom);
+        window.addEventListener('beforeunload', () => {
+            removePlayerFromFirebase();
         });
 
-        document.getElementById('classRoomSelect').addEventListener('change', (e) => {
-            currentRoom = e.target.value;
-        });
-
-        document.getElementById('helpButton').addEventListener('click', () => {
-            const helpText = getTranslation('instructions');
-            addMessage(helpText);
-            speakText(helpText, true);
-        });
-
-        document.getElementById('quizButton').addEventListener('click', () => {
-            mesoShowQuestion();
-        });
-
-        document.getElementById('languageSelect').addEventListener('change', (e) => {
-            currentLanguage = e.target.value;
-            applyTranslations();
-            const label = document.getElementById('voiceLabel');
-            label.textContent = voiceEnabled ? 'Voice: On' : 'Voice: Off';
-        });
-
-        document.getElementById('voiceToggle').addEventListener('click', () => {
-            voiceEnabled = !voiceEnabled;
-            const label = document.getElementById('voiceLabel');
-            const icon = document.getElementById('voiceIcon');
-            if (voiceEnabled) {
-                label.textContent = 'Voice: On';
-                icon.textContent = '🔊';
-            } else {
-                label.textContent = 'Voice: Off';
-                icon.textContent = '🔇';
-                if (window.speechSynthesis) {
-                    window.speechSynthesis.cancel();
+        resizeCanvas();
+        console.log('Cell Battle - Multiplayer Edition (with keyboard controls & banked leaderboard)');
+        console.log('Firebase Status:', firebaseEnabled ? 'Connected ✓' : 'Not configured ⚠️');
+        
+        // Update room counts every 3 seconds when on start menu
+        if (firebaseEnabled) {
+            updateRoomCounts();
+            setInterval(() => {
+                if (!gameStarted) {
+                    updateRoomCounts();
                 }
-            }
-        });
-
-        // ===================================================================
-        // ROOM & STARTUP
-        // ===================================================================
-        function changeRoom(newRoom) {
-            if (firebaseEnabled && playerId) {
-                database.ref('rooms/' + currentRoom + '/players/' + playerId).remove();
-            }
-            currentRoom = newRoom;
-            document.getElementById('roomDisplay').textContent = currentRoom.split('-')[1].toUpperCase();
-            addMessage(`Switched to ${currentRoom.toUpperCase()}`);
-            if (firebaseEnabled && playerId) {
-                syncPlayerToFirebase();
-                listenToOtherPlayers();
-            }
+            }, 3000);
         }
-
-        function createSafeZoneLabels() {
-            SAFE_ZONES.forEach((zone, index) => {
-                const label = document.createElement('div');
-                label.className = 'safe-zone-label';
-                label.textContent = 'SAFE ZONE';
-                document.body.appendChild(label);
-                safeZoneLabels[index] = label;
-            });
-            updateSafeZoneLabels();
-        }
-
-        function startGame() {
-            const nameInput = document.getElementById('nameInput').value.trim();
-            playerName = nameInput || 'Player';
-            document.getElementById('startScreen').style.display = 'none';
-
-            const startPos = getRandomSafeZonePosition();
-            playerId = 'player_' + Math.random().toString(36).substr(2, 9);
-            player = new Cell(startPos.x, startPos.y, CONFIG.INITIAL_MASS, randColor(), playerName);
-            lastMass = player.mass;
-
-            generateFood();
-            createSafeZoneLabels();
-            updateSafeZoneLabels();
-
-            document.getElementById('roomDisplay').textContent = currentRoom.split('-')[1].toUpperCase();
-            document.getElementById('playerNameDisplay').textContent = playerName;
-
-            applyTranslations();
-            addMessage("Game started. Good luck!");
-            speakText("Game started. Good luck!");
-
-            gameStarted = true;
-
-            if (firebaseEnabled) {
-                listenToOtherPlayers();
-                listenForDeaths();
-                window.addEventListener('beforeunload', removePlayerFromFirebase);
-            }
-
-            lastUpdate = Date.now();
-            requestAnimationFrame(gameLoop);
-        }
-
-        // ===================================================================
-        // INIT
-        // ===================================================================
-        applyTranslations();
-        createSafeZoneLabels();
-
-        window.addEventListener('resize', () => {
-            resizeCanvas();
-            updateSafeZoneLabels();
-        });
     </script>
 </body>
 </html>
