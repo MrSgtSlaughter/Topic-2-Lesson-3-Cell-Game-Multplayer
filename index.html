@@ -81,7 +81,7 @@
             border-radius: 10px;
             width: 100%;
             max-width: 300px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         #startMenu button {
@@ -409,10 +409,10 @@
         <div style="margin: 20px 0;">
             <label style="font-size: 18px; color: #667eea; font-weight: bold;">Choose Your Room:</label>
             <select id="roomSelect" style="width: 100%; max-width: 300px; padding: 15px; font-size: 18px; border: 2px solid #667eea; border-radius: 10px; margin-top: 10px;">
-                <option value="room-a">🟢 Room A (Players: <span id="countA">0</span>)</option>
-                <option value="room-b">🔵 Room B (Players: <span id="countB">0</span>)</option>
-                <option value="room-c">🟡 Room C (Players: <span id="countC">0</span>)</option>
-                <option value="room-d">🔴 Room D (Players: <span id="countD">0</span>)</option>
+                <option value="room-a">🟢 Room A (Players: 0)</option>
+                <option value="room-b">🔵 Room B (Players: 0)</option>
+                <option value="room-c">🟡 Room C (Players: 0)</option>
+                <option value="room-d">🔴 Room D (Players: 0)</option>
             </select>
             <p style="margin-top: 10px; color: #666; font-size: 14px;">💡 Pick the room with fewer players for best experience!</p>
         </div>
@@ -485,7 +485,6 @@
             firebaseEnabled = true;
             console.log("Firebase connected successfully!");
             
-            // Initialize Firestore for quiz logging
             try {
                 mesoDb = firebase.firestore();
                 console.log("Firestore connected for quiz logging!");
@@ -497,129 +496,29 @@
         }
 
         // ===================================================================
-        // MESOPOTAMIA QUIZ SYSTEM - Topic 2 Lesson 3
+        // MESOPOTAMIA QUIZ SYSTEM
         // ===================================================================
         const MESO_QUESTIONS = [
-            {
-                id: 1,
-                text: "After Hammurabi's death, which northern Mesopotamian people later united the region again?",
-                choices: { A: "Egyptians", B: "Assyrians", C: "Greeks", D: "Phoenicians" },
-                correct: "B"
-            },
-            {
-                id: 2,
-                text: "What helped Assyria become a powerful military state?",
-                choices: { A: "A huge navy", B: "Camels for desert travel", C: "Iron weapons and cavalry", D: "Stone city walls" },
-                correct: "C"
-            },
-            {
-                id: 3,
-                text: "What is cavalry?",
-                choices: { A: "Soldiers who fight on foot", B: "Soldiers who fight while riding horses", C: "Soldiers who guard temples", D: "Soldiers who control boats" },
-                correct: "B"
-            },
-            {
-                id: 4,
-                text: "How did the Assyrians organize their huge empire?",
-                choices: { A: "Each city ruled itself with no control", B: "They divided it into provinces with governors", C: "They had only one giant city", D: "They used democracy everywhere" },
-                correct: "B"
-            },
-            {
-                id: 5,
-                text: "Which city did Ashurbanipal make his capital?",
-                choices: { A: "Babylon", B: "Persepolis", C: "Nineveh", D: "Jerusalem" },
-                correct: "C"
-            },
-            {
-                id: 6,
-                text: "What was special about Ashurbanipal's library at Nineveh?",
-                choices: { A: "It stored only farming tools", B: "It held thousands of cuneiform tablets", C: "It was built underwater", D: "It was only for soldiers" },
-                correct: "B"
-            },
-            {
-                id: 7,
-                text: "Nebuchadnezzar II was king of which empire?",
-                choices: { A: "Old Babylonian", B: "Neo-Babylonian", C: "Egyptian", D: "Persian" },
-                correct: "B"
-            },
-            {
-                id: 8,
-                text: "Which famous project is Nebuchadnezzar II best known for?",
-                choices: { A: "The Great Pyramids", B: "The Great Wall", C: "The Hanging Gardens of Babylon", D: "The Lighthouse of Alexandria" },
-                correct: "C"
-            },
-            {
-                id: 9,
-                text: "Cyrus the Great first won an empire by defeating which people?",
-                choices: { A: "The Medes", B: "The Egyptians", C: "The Greeks", D: "The Romans" },
-                correct: "A"
-            },
-            {
-                id: 10,
-                text: "What is a standing army?",
-                choices: { A: "Soldiers who only fight in summer", B: "A permanent, professional army", C: "Farmers who fight when needed", D: "An army made only of nobles" },
-                correct: "B"
-            },
-            {
-                id: 11,
-                text: "The Persian 'Immortals' were:",
-                choices: { A: "A group of gods", B: "Elite soldiers in a 10,000-man unit", C: "A royal family", D: "A group of priests" },
-                correct: "B"
-            },
-            {
-                id: 12,
-                text: "How did Cyrus treat conquered peoples like the Babylonians and Jews?",
-                choices: { A: "Destroyed their temples", B: "Forced only Persian customs", C: "Allowed their religions and customs", D: "Made them leave their homelands" },
-                correct: "C"
-            },
-            {
-                id: 13,
-                text: "Which Persian ruler expanded the empire and built the Great Royal Road?",
-                choices: { A: "Sargon", B: "Nebuchadnezzar II", C: "Darius the Great", D: "Ashurbanipal" },
-                correct: "C"
-            },
-            {
-                id: 14,
-                text: "What was tribute in the Persian empire?",
-                choices: { A: "A type of coin", B: "Payment to show loyalty to a stronger power", C: "A law code", D: "A royal road" },
-                correct: "B"
-            },
-            {
-                id: 15,
-                text: "How did Darius make trade easier across the Persian empire?",
-                choices: { A: "Banned all foreign goods", B: "Forced everyone to barter", C: "Created a common currency of gold coins", D: "Closed the Great Royal Road" },
-                correct: "C"
-            },
-            {
-                id: 16,
-                text: "What did the Great Royal Road connect?",
-                choices: { A: "Rome and Athens", B: "Nineveh and Jerusalem", C: "Susa and Sardis (and other parts of the empire)", D: "Babylon and the Nile delta" },
-                correct: "C"
-            },
-            {
-                id: 17,
-                text: "What is the main idea of Zoroastrianism?",
-                choices: { A: "Thousands of equal gods", B: "Universe is a struggle between good and evil", C: "Ignore right and wrong", D: "Only kings reach the afterlife" },
-                correct: "B"
-            },
-            {
-                id: 18,
-                text: "What is the name of the Zoroastrian sacred text?",
-                choices: { A: "The Torah", B: "The Bible", C: "The Avesta", D: "The Epic of Gilgamesh" },
-                correct: "C"
-            },
-            {
-                id: 19,
-                text: "How did Darius balance local self-government with central power?",
-                choices: { A: "Ruled every village personally", B: "Banned all local traditions", C: "Provinces with local leaders under central control", D: "Let the army decide everything" },
-                correct: "C"
-            },
-            {
-                id: 20,
-                text: "Why are the Assyrian and Persian empires important in Mesopotamian history?",
-                choices: { A: "They ended writing and trade", B: "They united regions and spread new ideas", C: "They stayed small and isolated", D: "They used no armies at all" },
-                correct: "B"
-            }
+            { id: 1, text: "After Hammurabi's death, which northern Mesopotamian people later united the region again?", choices: { A: "Egyptians", B: "Assyrians", C: "Greeks", D: "Phoenicians" }, correct: "B" },
+            { id: 2, text: "What helped Assyria become a powerful military state?", choices: { A: "A huge navy", B: "Camels for desert travel", C: "Iron weapons and cavalry", D: "Stone city walls" }, correct: "C" },
+            { id: 3, text: "What is cavalry?", choices: { A: "Soldiers who fight on foot", B: "Soldiers who fight while riding horses", C: "Soldiers who guard temples", D: "Soldiers who control boats" }, correct: "B" },
+            { id: 4, text: "How did the Assyrians organize their huge empire?", choices: { A: "Each city ruled itself with no control", B: "They divided it into provinces with governors", C: "They had only one giant city", D: "They used democracy everywhere" }, correct: "B" },
+            { id: 5, text: "Which city did Ashurbanipal make his capital?", choices: { A: "Babylon", B: "Persepolis", C: "Nineveh", D: "Jerusalem" }, correct: "C" },
+            { id: 6, text: "What was special about Ashurbanipal's library at Nineveh?", choices: { A: "It stored only farming tools", B: "It held thousands of cuneiform tablets", C: "It was built underwater", D: "It was only for soldiers" }, correct: "B" },
+            { id: 7, text: "Nebuchadnezzar II was king of which empire?", choices: { A: "Old Babylonian", B: "Neo-Babylonian", C: "Egyptian", D: "Persian" }, correct: "B" },
+            { id: 8, text: "Which famous project is Nebuchadnezzar II best known for?", choices: { A: "The Great Pyramids", B: "The Great Wall", C: "The Hanging Gardens of Babylon", D: "The Lighthouse of Alexandria" }, correct: "C" },
+            { id: 9, text: "Cyrus the Great first won an empire by defeating which people?", choices: { A: "The Medes", B: "The Egyptians", C: "The Greeks", D: "The Romans" }, correct: "A" },
+            { id: 10, text: "What is a standing army?", choices: { A: "Soldiers who only fight in summer", B: "A permanent, professional army", C: "Farmers who fight when needed", D: "An army made only of nobles" }, correct: "B" },
+            { id: 11, text: "The Persian 'Immortals' were:", choices: { A: "A group of gods", B: "Elite soldiers in a 10,000-man unit", C: "A royal family", D: "A group of priests" }, correct: "B" },
+            { id: 12, text: "How did Cyrus treat conquered peoples like the Babylonians and Jews?", choices: { A: "Destroyed their temples", B: "Forced only Persian customs", C: "Allowed their religions and customs", D: "Made them leave their homelands" }, correct: "C" },
+            { id: 13, text: "Which Persian ruler expanded the empire and built the Great Royal Road?", choices: { A: "Sargon", B: "Nebuchadnezzar II", C: "Darius the Great", D: "Ashurbanipal" }, correct: "C" },
+            { id: 14, text: "What was tribute in the Persian empire?", choices: { A: "A type of coin", B: "Payment to show loyalty to a stronger power", C: "A law code", D: "A royal road" }, correct: "B" },
+            { id: 15, text: "How did Darius make trade easier across the Persian empire?", choices: { A: "Banned all foreign goods", B: "Forced everyone to barter", C: "Created a common currency of gold coins", D: "Closed the Great Royal Road" }, correct: "C" },
+            { id: 16, text: "What did the Great Royal Road connect?", choices: { A: "Rome and Athens", B: "Nineveh and Jerusalem", C: "Susa and Sardis (and other parts of the empire)", D: "Babylon and the Nile delta" }, correct: "C" },
+            { id: 17, text: "What is the main idea of Zoroastrianism?", choices: { A: "Thousands of equal gods", B: "Universe is a struggle between good and evil", C: "Ignore right and wrong", D: "Only kings reach the afterlife" }, correct: "B" },
+            { id: 18, text: "What is the name of the Zoroastrian sacred text?", choices: { A: "The Torah", B: "The Bible", C: "The Avesta", D: "The Epic of Gilgamesh" }, correct: "C" },
+            { id: 19, text: "How did Darius balance local self-government with central power?", choices: { A: "Ruled every village personally", B: "Banned all local traditions", C: "Provinces with local leaders under central control", D: "Let the army decide everything" }, correct: "C" },
+            { id: 20, text: "Why are the Assyrian and Persian empires important in Mesopotamian history?", choices: { A: "They ended writing and trade", B: "They united regions and spread new ideas", C: "They stayed small and isolated", D: "They used no armies at all" }, correct: "B" }
         ];
 
         let mesoUsedIds = [];
@@ -662,14 +561,12 @@
         function mesoShowQuestion() {
             if (mesoOverlayVisible || !gameStarted || !player) return;
 
-            // Pause the game
             const wasPlaying = gameStarted;
             gameStarted = false;
 
             const q = mesoPickQuestion();
             mesoCurrentQuestion = q;
 
-            // Create overlay
             const overlay = document.createElement("div");
             overlay.id = "mesoQuizOverlay";
             Object.assign(overlay.style, {
@@ -755,7 +652,6 @@
                 btn.onclick = () => {
                     const isCorrect = (label === q.correct);
 
-                    // Update player mass
                     if (isCorrect) {
                         player.mass += 10;
                         feedbackEl.textContent = "✅ Correct! +10 Mass";
@@ -768,10 +664,15 @@
                         speakText("Incorrect. You lost 10 mass.");
                     }
 
-                    // Log to Firestore
+                    if (player.mass > CONFIG.MAX_MASS) player.mass = CONFIG.MAX_MASS;
+
                     mesoLogAnswer(q, label, isCorrect);
 
-                    // Disable all buttons
+                    // 3s immunity after answering
+                    player.immunityUntil = Date.now() + 3000;
+                    syncPlayerToFirebase();
+                    speakText("You are immune for three seconds!");
+
                     const allButtons = choicesEl.querySelectorAll("button");
                     allButtons.forEach(b => {
                         b.disabled = true;
@@ -779,7 +680,6 @@
                         b.style.cursor = "not-allowed";
                     });
 
-                    // Highlight correct answer
                     allButtons.forEach(b => {
                         if (b.textContent.startsWith(q.correct + ".")) {
                             b.style.background = "#22c55e";
@@ -787,12 +687,10 @@
                         }
                     });
 
-                    // Close after 3 seconds
                     setTimeout(() => {
                         document.body.removeChild(overlay);
                         mesoOverlayVisible = false;
                         gameStarted = wasPlaying;
-                        // Restart game loop if it was running
                         if (wasPlaying) {
                             lastUpdate = Date.now();
                             gameLoop();
@@ -815,7 +713,7 @@
         }
 
         // ===================================================================
-        // ACCESSIBILITY FEATURES
+        // ACCESSIBILITY FEATURES (TTS ETC.)
         // ===================================================================
         let ttsEnabled = true;
         let currentLanguage = 'en';
@@ -874,12 +772,10 @@
 
         function speakText(text, interrupt = false) {
             if (!ttsEnabled && !interrupt) return;
-            
             if ('speechSynthesis' in window) {
                 if (interrupt) {
                     window.speechSynthesis.cancel();
                 }
-                
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.rate = speechRate;
                 utterance.lang = getLanguageCode(currentLanguage);
@@ -940,7 +836,6 @@
             speakText(helpText, true);
         }
 
-        // Accessibility controls
         document.getElementById('dyslexiaFont').addEventListener('change', (e) => {
             document.body.classList.toggle('dyslexia-font', e.target.checked);
             speakText('Easy-read font ' + (e.target.checked ? 'enabled' : 'disabled'));
@@ -983,20 +878,19 @@
             WORLD_WIDTH: 3000,
             WORLD_HEIGHT: 3000,
             INITIAL_MASS: 10,
-            MAX_MASS: 300,  // Maximum cell size to keep game playable
+            MAX_MASS: 670,
             FOOD_MASS: 1,
             MAX_FOOD: 300,
             FOOD_SIZE: 5,
-            MIN_SPLIT_MASS: 20,  // Reduced from 30 to allow banking sooner
+            MIN_SPLIT_MASS: 20,
             SPLIT_SPEED: 15,
-            SPEED_MULTIPLIER: 12,  // Slightly boosted and adjusted formula so big cells are faster than before
+            SPEED_MULTIPLIER: 11,
             MASS_LOSS_RATE: 0.002,
             MIN_MASS: 10,
             SAFE_ZONE_SIZE: 400,
-            SAFE_ZONE_TIME: 15000, // 15 seconds in milliseconds
+            SAFE_ZONE_TIME: 15000,
         };
 
-        // Safe zones in corners
         const SAFE_ZONES = [
             { x: 200, y: 200, label: 'Top Left' },
             { x: CONFIG.WORLD_WIDTH - 200, y: 200, label: 'Top Right' },
@@ -1027,7 +921,6 @@
         let safeZoneEnterTime = 0;
         let currentSafeZone = null;
 
-        // NEW: keyboard movement state
         const keys = {
             ArrowUp: false,
             ArrowDown: false,
@@ -1093,34 +986,28 @@
             const zone = isInSafeZone(player.x, player.y);
             
             if (zone && !inSafeZone) {
-                // Just entered safe zone
                 inSafeZone = true;
                 safeZoneEnterTime = Date.now();
                 currentSafeZone = zone;
                 speakText(`Entered safe zone! You have 15 seconds.`);
             } else if (!zone && inSafeZone) {
-                // Just left safe zone
                 inSafeZone = false;
                 currentSafeZone = null;
             } else if (zone && inSafeZone) {
-                // Still in safe zone - check timer
                 const timeInZone = Date.now() - safeZoneEnterTime;
                 if (timeInZone >= CONFIG.SAFE_ZONE_TIME) {
-                    // Time's up! Eject player
                     ejectFromSafeZone(zone);
                 }
             }
         }
 
         function ejectFromSafeZone(zone) {
-            // Push player away from zone center
             const angle = Math.random() * Math.PI * 2;
             const ejectDistance = CONFIG.SAFE_ZONE_SIZE / 2 + 100;
             
             player.x = zone.x + Math.cos(angle) * ejectDistance;
             player.y = zone.y + Math.sin(angle) * ejectDistance;
             
-            // Keep in bounds
             player.x = Math.max(player.radius, Math.min(CONFIG.WORLD_WIDTH - player.radius, player.x));
             player.y = Math.max(player.radius, Math.min(CONFIG.WORLD_HEIGHT - player.radius, player.y));
             
@@ -1141,7 +1028,8 @@
                 this.name = name;
                 this.vx = 0;
                 this.vy = 0;
-                this.bankedScore = 0;  // Permanent banked points
+                this.bankedScore = 0;
+                this.immunityUntil = 0;
             }
 
             get radius() {
@@ -1149,10 +1037,26 @@
             }
 
             get speed() {
-                // Make large cells not crawl: reduce the slowdown curve and add a small base
                 const m = Math.max(this.mass, CONFIG.INITIAL_MASS);
-                const base = CONFIG.SPEED_MULTIPLIER / Math.pow(m, 0.4);
-                return base + 1.5;
+                const base = CONFIG.SPEED_MULTIPLIER / Math.pow(m, 0.38);
+                return base + 1.2;
+            }
+
+            drawGlowIfImmune(screenX, screenY) {
+                const now = Date.now();
+                if (this.immunityUntil && now < this.immunityUntil) {
+                    const pulse = 0.4 + 0.4 * Math.sin(now / 120);
+                    const r = this.radius + 10;
+                    ctx.save();
+                    ctx.strokeStyle = `rgba(255, 0, 0, ${0.6 + pulse / 2})`;
+                    ctx.lineWidth = 6;
+                    ctx.shadowColor = 'rgba(255,0,0,0.9)';
+                    ctx.shadowBlur = 20;
+                    ctx.beginPath();
+                    ctx.arc(screenX, screenY, r, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.restore();
+                }
             }
 
             move(targetX, targetY) {
@@ -1171,7 +1075,6 @@
                     this.y = Math.max(this.radius, Math.min(CONFIG.WORLD_HEIGHT - this.radius, this.y));
                 }
 
-                // Enforce max mass
                 if (this.mass > CONFIG.MAX_MASS) {
                     this.mass = CONFIG.MAX_MASS;
                 }
@@ -1185,7 +1088,8 @@
                 const screenX = this.x - camX;
                 const screenY = this.y - camY;
 
-                // Draw shield if in safe zone
+                this.drawGlowIfImmune(screenX, screenY);
+
                 if (this.inSafeZone) {
                     const pulse = Math.sin(Date.now() / 300) * 0.2 + 0.8;
                     ctx.strokeStyle = 'rgba(0, 255, 100, ' + pulse + ')';
@@ -1194,7 +1098,6 @@
                     ctx.arc(screenX, screenY, this.radius + 10, 0, Math.PI * 2);
                     ctx.stroke();
                     
-                    // Shield icon
                     ctx.fillStyle = 'rgba(0, 255, 100, ' + pulse + ')';
                     ctx.font = '20px Arial';
                     ctx.fillText('🛡️', screenX + this.radius - 10, screenY - this.radius + 10);
@@ -1232,14 +1135,12 @@
             }
 
             split() {
-                // BANKING SYSTEM: Press SPACE to bank half your mass
                 if (this.mass < CONFIG.MIN_SPLIT_MASS) return null;
                 
                 const bankAmount = Math.floor(this.mass / 2);
                 this.mass -= bankAmount;
                 this.bankedScore += bankAmount;
                 
-                // Show notification
                 const notification = document.createElement('div');
                 notification.style.cssText = `
                     position: fixed;
@@ -1262,12 +1163,12 @@
                     document.body.removeChild(notification);
                 }, 1500);
                 
-                return null; // Don't create a new cell
+                return null;
             }
         }
 
         // ===================================================================
-        // FOOD & FIREBASE
+        // FOOD & FIREBASE SYNC
         // ===================================================================
         function generateFood() {
             while (food.length < CONFIG.MAX_FOOD) {
@@ -1308,21 +1209,18 @@
                 bankedScore: player.bankedScore,
                 color: player.color,
                 inSafeZone: inSafeZone,
+                immunityUntil: player.immunityUntil || 0,
                 lastUpdate: Date.now()
             });
         }
 
         function sendPlayerDeath(victimId) {
             if (!firebaseEnabled) return;
-            
-            // Send death signal to victim
             database.ref('rooms/' + currentRoom + '/deaths/' + victimId).set({
                 killedBy: playerId,
                 killerName: player.name,
                 timestamp: Date.now()
             });
-            
-            // Remove death signal after 1 second
             setTimeout(() => {
                 database.ref('rooms/' + currentRoom + '/deaths/' + victimId).remove();
             }, 1000);
@@ -1330,7 +1228,6 @@
 
         function listenForDeath() {
             if (!firebaseEnabled || !playerId) return;
-            
             database.ref('rooms/' + currentRoom + '/deaths/' + playerId).on('value', (snapshot) => {
                 const deathData = snapshot.val();
                 if (deathData && gameStarted) {
@@ -1352,7 +1249,8 @@
                             if (Date.now() - p.lastUpdate < 10000) {
                                 const cell = new Cell(p.x, p.y, p.mass, p.color, p.name);
                                 cell.inSafeZone = p.inSafeZone || false;
-                                cell.bankedScore = p.bankedScore || 0; // IMPORTANT: bring in their banked money
+                                cell.bankedScore = p.bankedScore || 0;
+                                cell.immunityUntil = p.immunityUntil || 0;
                                 otherPlayers[id] = cell;
                             }
                         }
@@ -1369,6 +1267,7 @@
 
         function checkCollisions() {
             const beforeMass = player.mass;
+            const now = Date.now();
             
             food = food.filter(f => {
                 if (checkCollision(player, f)) {
@@ -1378,32 +1277,31 @@
                 return true;
             });
 
-            // Check collisions with other players
             Object.keys(otherPlayers).forEach(id => {
                 const other = otherPlayers[id];
                 
-                // Skip collision if either player is in a safe zone
                 const playerInSafe = inSafeZone;
                 const otherInSafe = other.inSafeZone || false;
-                
-                if (playerInSafe || otherInSafe) {
-                    return; // Skip this collision
+                const playerImmune = player.immunityUntil && now < player.immunityUntil;
+                const otherImmune = other.immunityUntil && now < other.immunityUntil;
+
+                if (playerInSafe || otherInSafe || playerImmune || otherImmune) {
+                    return;
                 }
                 
                 if (checkCollision(player, other)) {
                     if (player.canEat(other)) {
-                        // You ate them!
                         player.eat(other);
-                        sendPlayerDeath(id); // Tell them they died
+                        sendPlayerDeath(id);
                         speakText(getTranslation('atePlayer'));
                     } else if (other.canEat(player)) {
-                        // They ate you!
-                        // Your death will be detected by listenForDeath
+                        // handled by death listener
                     }
                 }
             });
 
-            // Announce significant growth
+            if (player.mass > CONFIG.MAX_MASS) player.mass = CONFIG.MAX_MASS;
+
             if (player.mass > beforeMass + 10) {
                 if (Math.floor(player.mass / 20) > Math.floor(lastMass / 20)) {
                     speakText(`You reached ${Math.floor(player.mass / 20) * 20} mass!`);
@@ -1452,21 +1350,17 @@
                 const screenY = zone.y - camera.y;
                 const radius = CONFIG.SAFE_ZONE_SIZE / 2;
 
-                // Draw pulsing safe zone
                 const pulse = Math.sin(Date.now() / 500) * 0.1 + 0.9;
                 
-                // Outer glow
                 ctx.fillStyle = 'rgba(0, 255, 100, ' + (0.1 * pulse) + ')';
                 ctx.beginPath();
                 ctx.arc(screenX, screenY, radius, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Border
                 ctx.strokeStyle = 'rgba(0, 255, 100, ' + (0.5 * pulse) + ')';
                 ctx.lineWidth = 3;
                 ctx.stroke();
 
-                // Label
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
                 ctx.font = 'bold 20px Arial';
                 ctx.textAlign = 'center';
@@ -1475,28 +1369,23 @@
                 ctx.fillText('15 sec max', screenX, screenY + 10);
             });
 
-            // Show timer if player is in safe zone
             if (inSafeZone && currentSafeZone) {
                 const timeInZone = Date.now() - safeZoneEnterTime;
                 const timeLeft = Math.max(0, CONFIG.SAFE_ZONE_TIME - timeInZone);
                 const secondsLeft = Math.ceil(timeLeft / 1000);
                 
-                // Draw timer above player
                 const screenX = player.x - camera.x;
                 const screenY = player.y - camera.y - player.radius - 30;
                 
-                // Timer background
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
                 ctx.fillRect(screenX - 50, screenY - 15, 100, 30);
                 
-                // Timer text
                 const warningColor = secondsLeft <= 5 ? '#ff4444' : '#00ff64';
                 ctx.fillStyle = warningColor;
                 ctx.font = 'bold 18px Arial';
                 ctx.textAlign = 'center';
                 ctx.fillText(`⏱️ ${secondsLeft}s`, screenX, screenY + 5);
                 
-                // Flash warning when low
                 if (secondsLeft <= 3 && Math.floor(Date.now() / 250) % 2 === 0) {
                     ctx.fillStyle = 'rgba(255, 68, 68, 0.3)';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -1520,7 +1409,6 @@
         function updateStats() {
             document.getElementById('playerMass').textContent = Math.floor(player.mass);
             document.getElementById('bankedScore').textContent = Math.floor(player.bankedScore);
-            // Leaderboard score = banked only
             const totalScore = Math.floor(player.bankedScore);
             document.getElementById('totalScore').textContent = totalScore;
             
@@ -1572,16 +1460,14 @@
         function gameLoop() {
             if (!gameStarted) return;
             const now = Date.now();
-            const dt = (now - lastUpdate) / 1000;
             lastUpdate = now;
 
-            ctx.fillStyle = 'rgba(102, 126, 234, 0.1)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
             drawGrid();
             drawWorldBorder();
             drawSafeZones();
 
-            // Combined mouse + keyboard movement
             let targetX = mouse.x + camera.x;
             let targetY = mouse.y + camera.y;
 
@@ -1600,7 +1486,6 @@
                 if (len > 0) {
                     dx /= len;
                     dy /= len;
-                    // Go far in that direction; Cell.move clamps speed
                     targetX = player.x + dx * 1000;
                     targetY = player.y + dy * 1000;
                 }
@@ -1625,7 +1510,6 @@
 
         function updateRoomCounts() {
             if (!firebaseEnabled) return;
-            
             const rooms = ['room-a', 'room-b', 'room-c', 'room-d'];
             rooms.forEach(room => {
                 database.ref('rooms/' + room + '/players').once('value', (snapshot) => {
@@ -1639,16 +1523,24 @@
                             }
                         });
                     }
-                    
-                    // Update the dropdown
                     const roomLetter = room.split('-')[1].toUpperCase();
                     const option = document.querySelector(`#roomSelect option[value="${room}"]`);
                     if (option) {
-                        const emoji = option.textContent.split(' ')[0]; // Keep the emoji
+                        const emoji = option.textContent.split(' ')[0];
                         option.textContent = `${emoji} Room ${roomLetter} (Players: ${count})`;
                     }
                 });
             });
+        }
+
+        function getRandomSafeZonePosition() {
+            const zone = SAFE_ZONES[Math.floor(Math.random() * SAFE_ZONES.length)];
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 50;
+            return {
+                x: zone.x + Math.cos(angle) * distance,
+                y: zone.y + Math.sin(angle) * distance
+            };
         }
 
         function startGame() {
@@ -1683,29 +1575,17 @@
             gameStarted = true;
             lastUpdate = Date.now();
             
-            // Start quiz timer - first question after 40 seconds, then every 40 seconds
             if (quizInterval) clearInterval(quizInterval);
             quizInterval = setInterval(() => {
                 if (gameStarted && !mesoOverlayVisible) {
                     mesoShowQuestion();
                 }
-            }, 40000); // 40 seconds
+            }, 40000);
             
             const welcomeText = getTranslation('instructions');
             speakText(`Welcome ${playerName} to Room ${roomLetter}! You start in a safe zone. Answer Mesopotamia questions every 40 seconds to grow! ${welcomeText}`);
             
             gameLoop();
-        }
-
-        function getRandomSafeZonePosition() {
-            const zone = SAFE_ZONES[Math.floor(Math.random() * SAFE_ZONES.length)];
-            // Spawn near center of safe zone
-            const angle = Math.random() * Math.PI * 2;
-            const distance = Math.random() * 50; // Within 50 units of center
-            return {
-                x: zone.x + Math.cos(angle) * distance,
-                y: zone.y + Math.sin(angle) * distance
-            };
         }
 
         function respawnPlayer() {
@@ -1714,14 +1594,14 @@
             player.y = startPos.y;
             player.mass = CONFIG.INITIAL_MASS;
             lastMass = player.mass;
-            
-            // Reset safe zone timer
             inSafeZone = false;
             safeZoneEnterTime = 0;
             currentSafeZone = null;
         }
 
-        // Event listeners
+        // ===================================================================
+        // INPUT HANDLERS
+        // ===================================================================
         window.addEventListener('resize', resizeCanvas);
         canvas.addEventListener('mousemove', (e) => {
             const rect = canvas.getBoundingClientRect();
@@ -1737,14 +1617,15 @@
         });
 
         document.addEventListener('keydown', (e) => {
+            const tag = e.target.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) {
+                return; // allow typing in name box
+            }
+
             if (e.code === 'Space' && gameStarted) {
                 e.preventDefault();
-                const newCell = player.split();
-                if (newCell) {
-                    speakText(getTranslation('split'));
-                } else {
-                    speakText(getTranslation('split'));
-                }
+                player.split();
+                speakText(getTranslation('split'));
             }
 
             if (MOVE_KEYS.includes(e.code)) {
@@ -1754,6 +1635,10 @@
         });
 
         document.addEventListener('keyup', (e) => {
+            const tag = e.target.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) {
+                return;
+            }
             if (MOVE_KEYS.includes(e.code)) {
                 e.preventDefault();
                 keys[e.code] = false;
@@ -1769,11 +1654,11 @@
             removePlayerFromFirebase();
         });
 
+        // INITIALIZE
         resizeCanvas();
-        console.log('Cell Battle - Multiplayer Edition (with keyboard controls & banked leaderboard)');
+        console.log('Cell Battle - Multiplayer Edition');
         console.log('Firebase Status:', firebaseEnabled ? 'Connected ✓' : 'Not configured ⚠️');
         
-        // Update room counts every 3 seconds when on start menu
         if (firebaseEnabled) {
             updateRoomCounts();
             setInterval(() => {
