@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cell Battle - Multiplayer Game</title>
-    <link href="https://fonts.googleapis.com/css2?family=OpenDyslexic&display=swap" rel="stylesheet">
+    <title>Mesopotamia Paper Football Review</title>
     <style>
         * {
             margin: 0;
@@ -14,1658 +13,805 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            overflow: hidden;
-            background: #f0f0f0;
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c2c 100%);
+            min-height: 100vh;
+            padding: 20px;
         }
 
-        body.dyslexia-font {
-            font-family: 'OpenDyslexic', 'Arial', sans-serif !important;
-        }
-
-        body.dyslexia-font * {
-            font-family: 'OpenDyslexic', 'Arial', sans-serif !important;
-        }
-
-        body.high-contrast {
-            background: #000;
-            color: #fff;
-        }
-
-        body.high-contrast #startMenu {
-            background: #000;
-            border: 3px solid #fff;
-            color: #fff;
-        }
-
-        body.high-contrast .accessibility-panel {
-            background: #000;
-            border: 2px solid #fff;
-        }
-
-        #gameCanvas {
-            display: block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            cursor: none;
-        }
-
-        body.high-contrast #gameCanvas {
-            background: #000;
-        }
-
-        #startMenu {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
             background: white;
-            padding: 40px;
             border-radius: 20px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+            color: white;
+            padding: 30px;
             text-align: center;
-            z-index: 1000;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
+            position: relative;
+            overflow: hidden;
         }
 
-        #startMenu h1 {
-            color: #667eea;
-            margin-bottom: 20px;
-            font-size: 36px;
-        }
-
-        #startMenu input[type="text"] {
-            padding: 15px;
-            font-size: 18px;
-            border: 2px solid #667eea;
-            border-radius: 10px;
-            width: 100%;
-            max-width: 300px;
+        .header h1 {
+            font-size: 2.5em;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
             margin-bottom: 10px;
         }
 
-        #startMenu button {
-            padding: 15px 40px;
-            font-size: 20px;
-            background: #667eea;
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        /* Stadium Crowd */
+        .crowd {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 100%);
+            border-bottom: 3px solid #d4af37;
+        }
+
+        .crowd-section {
+            display: flex;
+            gap: 3px;
+        }
+
+        .fan {
+            width: 12px;
+            height: 20px;
+            border-radius: 4px 4px 0 0;
+            animation: cheer 2s infinite;
+        }
+
+        .fan:nth-child(odd) { background: #ff6b6b; animation-delay: 0.2s; }
+        .fan:nth-child(even) { background: #4ecdc4; animation-delay: 0.4s; }
+        .fan:nth-child(3n) { background: #ffe66d; animation-delay: 0.6s; }
+
+        @keyframes cheer {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* Scoreboard */
+        .scoreboard {
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 20px;
+            align-items: center;
+            border-bottom: 5px solid #d4af37;
+        }
+
+        .player-setup {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .player-setup input {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1em;
+            border: 3px solid #d4af37;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .score-display {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #d4af37;
+        }
+
+        .player-name {
+            color: #ffe66d;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .score {
             color: white;
+            font-size: 3em;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .vs {
+            color: #d4af37;
+            font-size: 2.5em;
+            font-weight: bold;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+        }
+
+        /* Football Field */
+        .field {
+            background: linear-gradient(to bottom, 
+                #2d5016 0%, #2d5016 10%,
+                #3a6320 10%, #3a6320 20%,
+                #2d5016 20%, #2d5016 30%,
+                #3a6320 30%, #3a6320 40%,
+                #2d5016 40%, #2d5016 50%,
+                #3a6320 50%, #3a6320 60%,
+                #2d5016 60%, #2d5016 70%,
+                #3a6320 70%, #3a6320 80%,
+                #2d5016 80%, #2d5016 90%,
+                #3a6320 90%, #3a6320 100%
+            );
+            padding: 40px;
+            min-height: 200px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .football {
+            font-size: 4em;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        /* Score Buttons */
+        .score-buttons-container {
+            background: #f8f9fa;
+            padding: 30px;
+        }
+
+        .scoring-instruction {
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            border: 3px solid #d4af37;
+        }
+
+        .score-buttons-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .player-scoring-section {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            border: 3px solid #d4af37;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .player-scoring-section h3 {
+            text-align: center;
+            color: #8B4513;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .player-score-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .score-btn {
+            padding: 15px 20px;
+            font-size: 1.1em;
+            font-weight: bold;
             border: none;
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s;
-            margin: 5px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
 
-        #startMenu button:hover {
-            background: #764ba2;
-            transform: scale(1.05);
-        }
-
-        .accessibility-panel {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            text-align: left;
-        }
-
-        .accessibility-panel h3 {
-            color: #667eea;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .accessibility-option {
-            margin: 12px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .accessibility-option input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-        }
-
-        .accessibility-option label {
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        select {
-            padding: 10px;
-            font-size: 16px;
-            border: 2px solid #667eea;
-            border-radius: 8px;
-            background: white;
-            cursor: pointer;
-        }
-
-        #leaderboard, #stats {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-            z-index: 100;
-        }
-
-        body.high-contrast #leaderboard,
-        body.high-contrast #stats {
-            background: rgba(0, 0, 0, 0.95);
-            border: 2px solid #fff;
-            color: #fff;
-        }
-
-        #leaderboard {
-            top: 20px;
-            right: 20px;
-            min-width: 200px;
-        }
-
-        #stats {
-            top: 20px;
-            left: 20px;
-        }
-
-        #leaderboard h2 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 20px;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
-        }
-
-        body.high-contrast #leaderboard h2,
-        body.high-contrast #stats h3 {
-            color: #fff;
-            border-bottom-color: #fff;
-        }
-
-        .leaderboard-entry {
-            padding: 8px;
-            margin: 5px 0;
-            background: #f8f8f8;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        body.high-contrast .leaderboard-entry {
-            background: #333;
-            color: #fff;
-        }
-
-        .leaderboard-entry.current-player {
-            background: #667eea;
+        .touchdown-btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #c92a2a 100%);
             color: white;
-            font-weight: bold;
         }
 
-        body.high-contrast .leaderboard-entry.current-player {
-            background: #fff;
-            color: #000;
+        .touchdown-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
         }
 
-        #stats h3 {
-            color: #667eea;
-            margin-bottom: 10px;
+        .extra-point-btn {
+            background: linear-gradient(135deg, #51cf66 0%, #2f9e44 100%);
+            color: white;
         }
 
-        .stat-item {
-            margin: 5px 0;
-            font-size: 16px;
+        .extra-point-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
         }
 
-        #instructions {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f0f0f0;
-            border-radius: 10px;
-            text-align: left;
+        /* Question Section */
+        .question-section {
+            padding: 40px;
+            background: white;
         }
 
-        body.high-contrast #instructions {
-            background: #333;
-        }
-
-        #instructions h3 {
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-
-        body.high-contrast #instructions h3 {
-            color: #fff;
-        }
-
-        #instructions ul {
-            margin-left: 20px;
-        }
-
-        #instructions li {
-            margin: 8px 0;
-            line-height: 1.4;
-        }
-
-        .accessibility-controls {
-            position: absolute;
-            top: 20px;
-            right: 250px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 15px;
-            border-radius: 10px;
-            z-index: 100;
-        }
-
-        body.high-contrast .accessibility-controls {
-            background: rgba(0, 0, 0, 0.95);
-            border: 2px solid #fff;
-        }
-
-        .accessibility-controls button {
-            display: block;
+        .question-btn {
             width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-            font-size: 14px;
-            background: #667eea;
+            padding: 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-bottom: 30px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .question-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+
+        .question-display {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            border: 3px solid #8B4513;
+            min-height: 200px;
+            display: none;
+        }
+
+        .question-display.active {
+            display: block;
+            animation: slideIn 0.5s;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .question-text {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .question-type {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #8B4513;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1em;
+        }
+
+        .option:hover {
+            background: #e9ecef;
+            border-color: #8B4513;
+            transform: translateX(5px);
+        }
+
+        .fill-blank-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            border: 2px solid #8B4513;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .answer-display {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            display: none;
+        }
+
+        .answer-display.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+            display: block;
+        }
+
+        .answer-display.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+            display: block;
+        }
+
+        .reset-btn {
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: #6c757d;
             color: white;
             border: none;
             border-radius: 8px;
             cursor: pointer;
+            font-size: 1em;
         }
 
-        .accessibility-controls button:hover {
-            background: #764ba2;
+        .reset-btn:hover {
+            background: #5a6268;
         }
 
-        #minimap {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 150px;
-            height: 150px;
-            background: rgba(255, 255, 255, 0.9);
-            border: 3px solid #667eea;
-            border-radius: 10px;
-            z-index: 100;
-        }
-
-        body.high-contrast #minimap {
-            background: rgba(0, 0, 0, 0.9);
-            border-color: #fff;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .speaker-icon {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            background: #667eea;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 24px;
-            color: white;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .speaker-icon:hover {
-            background: #764ba2;
-        }
-
-        @keyframes popIn {
-            0% { transform: translate(-50%, -50%) scale(0); }
-            50% { transform: translate(-50%, -50%) scale(1.2); }
-            100% { transform: translate(-50%, -50%) scale(1); }
+        @media (max-width: 768px) {
+            .score-buttons-row {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <canvas id="gameCanvas"></canvas>
-    
-    <div id="startMenu">
-        <h1>🎮 Cell Battle</h1>
-        <p>Mesopotamia Edition - Topic 2 Lesson 3</p>
-        
-        <!-- Accessibility Features -->
-        <div class="accessibility-panel">
-            <h3>
-                🎮 Helpful Tools
-                <span class="speaker-icon" onclick="speakText('Helpful Tools panel. Customize the game to work best for you.')" title="Read aloud">🔊</span>
-            </h3>
-            
-            <div class="accessibility-option">
-                <input type="checkbox" id="dyslexiaFont">
-                <label for="dyslexiaFont">
-                    Easy-Read Font
-                    <span class="speaker-icon" onclick="speakText('Enable easy-read font with clearer letter shapes')" title="Read aloud">🔊</span>
-                </label>
-            </div>
-            
-            <div class="accessibility-option">
-                <input type="checkbox" id="highContrast">
-                <label for="highContrast">
-                    High Contrast Colors
-                    <span class="speaker-icon" onclick="speakText('Enable high contrast black and white colors for easier viewing')" title="Read aloud">🔊</span>
-                </label>
-            </div>
-            
-            <div class="accessibility-option">
-                <input type="checkbox" id="textToSpeech" checked>
-                <label for="textToSpeech">
-                    Read Text Aloud
-                    <span class="speaker-icon" onclick="speakText('Turn on automatic reading of game text out loud')" title="Read aloud">🔊</span>
-                </label>
-            </div>
-            
-            <div class="accessibility-option">
-                <input type="checkbox" id="largerText">
-                <label for="largerText">
-                    Bigger Text
-                    <span class="speaker-icon" onclick="speakText('Make all text bigger and easier to read')" title="Read aloud">🔊</span>
-                </label>
-            </div>
-            
-            <div class="accessibility-option">
-                <label for="languageSelect">
-                    Language:
-                    <span class="speaker-icon" onclick="speakText('Choose your preferred language')" title="Read aloud">🔊</span>
-                </label>
-                <select id="languageSelect">
-                    <option value="en">English</option>
-                    <option value="es">Español (Spanish)</option>
-                    <option value="fr">Français (French)</option>
-                    <option value="zh">中文 (Chinese)</option>
-                    <option value="ar">العربية (Arabic)</option>
-                    <option value="pt">Português (Portuguese)</option>
-                </select>
-            </div>
+    <div class="game-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🏈 MESOPOTAMIA PAPER FOOTBALL REVIEW 🏈</h1>
+            <p>Ancient Civilizations Showdown</p>
+        </div>
 
-            <div class="accessibility-option">
-                <label for="speechRate">
-                    Voice Speed:
-                    <span class="speaker-icon" onclick="speakText('Choose how fast the voice reads')" title="Read aloud">🔊</span>
-                </label>
-                <select id="speechRate">
-                    <option value="0.5">Slow</option>
-                    <option value="0.75">Medium-Slow</option>
-                    <option value="1" selected>Normal</option>
-                    <option value="1.25">Medium-Fast</option>
-                    <option value="1.5">Fast</option>
-                </select>
+        <!-- Stadium Crowd -->
+        <div class="crowd">
+            <div class="crowd-section">
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
+            </div>
+            <div class="crowd-section">
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
+            </div>
+            <div class="crowd-section">
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
+            </div>
+            <div class="crowd-section">
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
+                <div class="fan"></div>
             </div>
         </div>
 
-        <input type="text" id="playerName" placeholder="Enter your name" maxlength="20" />
-        
-        <div style="margin: 20px 0;">
-            <label style="font-size: 18px; color: #667eea; font-weight: bold;">Choose Your Room:</label>
-            <select id="roomSelect" style="width: 100%; max-width: 300px; padding: 15px; font-size: 18px; border: 2px solid #667eea; border-radius: 10px; margin-top: 10px;">
-                <option value="room-a">🟢 Room A (Players: 0)</option>
-                <option value="room-b">🔵 Room B (Players: 0)</option>
-                <option value="room-c">🟡 Room C (Players: 0)</option>
-                <option value="room-d">🔴 Room D (Players: 0)</option>
-            </select>
-            <p style="margin-top: 10px; color: #666; font-size: 14px;">💡 Pick the room with fewer players for best experience!</p>
+        <!-- Scoreboard -->
+        <div class="scoreboard">
+            <div class="player-setup">
+                <input type="text" id="player1Name" placeholder="Enter Player 1 Name" value="Player 1">
+                <div class="score-display">
+                    <div class="player-name" id="p1NameDisplay">Player 1</div>
+                    <div class="score" id="player1Score">0</div>
+                </div>
+            </div>
+            
+            <div class="vs">VS</div>
+            
+            <div class="player-setup">
+                <input type="text" id="player2Name" placeholder="Enter Player 2 Name" value="Player 2">
+                <div class="score-display">
+                    <div class="player-name" id="p2NameDisplay">Player 2</div>
+                    <div class="score" id="player2Score">0</div>
+                </div>
+            </div>
         </div>
-        
-        <button id="startButton">Start Game</button>
-        <button id="readInstructions">🔊 Read Instructions Aloud</button>
-        
-        <div id="instructions">
-            <h3>📚 How to Play:</h3>
-            <ul>
-                <li><strong>Pick a Room:</strong> Choose a room with fewer players</li>
-                <li><strong>Move:</strong> Use your mouse or trackpad, or arrow keys / W-A-S-D to control your cell</li>
-                <li><strong>Grow:</strong> Eat smaller cells and food pellets (smaller=faster, bigger=slower, but not painfully slow)</li>
-                <li><strong>Quiz Questions:</strong> 📜 Answer Mesopotamia questions every 40 seconds (+10 mass correct, -10 mass wrong)</li>
-                <li><strong>Safe Zones:</strong> 🛡️ Green corners protect you for 15 seconds</li>
-                <li><strong>💰 BANKING:</strong> Press SPACE to bank half your mass into permanent score (keeps even if eaten!)</li>
-                <li><strong>Goal:</strong> Build the highest BANKED SCORE!</li>
-            </ul>
+
+        <!-- Football Field -->
+        <div class="field">
+            <div class="football">🏈</div>
+        </div>
+
+        <!-- Score Buttons -->
+        <div class="score-buttons-container">
+            <div class="scoring-instruction">
+                👇 Award points to the player who answered correctly! 👇
+            </div>
+            
+            <div class="score-buttons-row">
+                <!-- Player 1 Scoring -->
+                <div class="player-scoring-section">
+                    <h3 id="p1ScoringTitle">Player 1 Scoring</h3>
+                    <div class="player-score-buttons">
+                        <button class="score-btn touchdown-btn" onclick="scorePoints(1, 6)">
+                            🏈 Touchdown (6 pts)
+                        </button>
+                        <button class="score-btn extra-point-btn" onclick="scorePoints(1, 1)">
+                            ✓ Extra Point (1 pt)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Player 2 Scoring -->
+                <div class="player-scoring-section">
+                    <h3 id="p2ScoringTitle">Player 2 Scoring</h3>
+                    <div class="player-score-buttons">
+                        <button class="score-btn touchdown-btn" onclick="scorePoints(2, 6)">
+                            🏈 Touchdown (6 pts)
+                        </button>
+                        <button class="score-btn extra-point-btn" onclick="scorePoints(2, 1)">
+                            ✓ Extra Point (1 pt)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Question Section -->
+        <div class="question-section">
+            <button class="question-btn" onclick="getRandomQuestion()">
+                📜 GET RANDOM QUESTION 📜
+            </button>
+
+            <div class="question-display" id="questionDisplay">
+                <!-- Question will appear here -->
+            </div>
+
+            <button class="reset-btn" onclick="resetGame()">Reset Game</button>
         </div>
     </div>
-
-    <div id="stats" class="hidden">
-        <h3>📊 Your Stats</h3>
-        <div class="stat-item">Current Mass: <strong id="playerMass">10</strong></div>
-        <div class="stat-item">Banked: <strong style="color: #FFD700;" id="bankedScore">0</strong> 💰</div>
-        <div class="stat-item">Total Score: <strong style="color: #4CAF50;" id="totalScore">0</strong></div>
-        <div class="stat-item">Rank (by banked): <strong id="playerRank">-</strong></div>
-        <div class="stat-item">Players: <strong id="playerCount">1</strong></div>
-    </div>
-
-    <div class="accessibility-controls hidden" id="gameAccessibility">
-        <button onclick="speakGameStatus()">🔊 My Stats</button>
-        <button onclick="speakLeaderboard()">🔊 Leaders</button>
-        <button onclick="toggleAccessibilityHelp()">📖 Help</button>
-    </div>
-
-    <div id="leaderboard" class="hidden">
-        <h2>🏆 Leaderboard (Banked)</h2>
-        <div id="leaderboardList"></div>
-    </div>
-
-    <canvas id="minimap" class="hidden"></canvas>
-
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <script>
-        // ===================================================================
-        // FIREBASE CONFIGURATION
-        // ===================================================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyC-3Nf96W-AKn-J2gyn9krCB3n5O5iISOo",
-            authDomain: "cell-battle-game.firebaseapp.com",
-            databaseURL: "https://cell-battle-game-default-rtdb.firebaseio.com",
-            projectId: "cell-battle-game",
-            storageBucket: "cell-battle-game.firebasestorage.app",
-            messagingSenderId: "482967839438",
-            appId: "1:482967839438:web:7b291ef4b2d2bc098a269f"
-        };
+        let player1Score = 0;
+        let player2Score = 0;
+        let currentQuestion = null;
 
-        let database;
-        let firebaseEnabled = false;
-        let mesoDb = null;
+        const questions = [
+            // Multiple Choice Questions
+            {
+                type: "Multiple Choice",
+                question: "What does 'Mesopotamia' mean in Greek?",
+                options: [
+                    "Land of rivers",
+                    "Land between the rivers",
+                    "Fertile land",
+                    "Ancient civilization"
+                ],
+                answer: 1
+            },
+            {
+                type: "Multiple Choice",
+                question: "Which two rivers flow through Mesopotamia?",
+                options: [
+                    "Nile and Jordan",
+                    "Indus and Ganges",
+                    "Tigris and Euphrates",
+                    "Yellow and Yangtze"
+                ],
+                answer: 2
+            },
+            {
+                type: "Multiple Choice",
+                question: "What was the first Mesopotamian city?",
+                options: [
+                    "Babylon",
+                    "Ur",
+                    "Uruk",
+                    "Nippur"
+                ],
+                answer: 2
+            },
+            {
+                type: "Multiple Choice",
+                question: "Who created the world's first empire?",
+                options: [
+                    "Hammurabi",
+                    "Sargon",
+                    "Cyrus",
+                    "Nebuchadnezzar"
+                ],
+                answer: 1
+            },
+            {
+                type: "Multiple Choice",
+                question: "What is cuneiform?",
+                options: [
+                    "A type of clay",
+                    "A system of writing using wedge-shaped symbols",
+                    "A religious temple",
+                    "A farming tool"
+                ],
+                answer: 1
+            },
+            {
+                type: "Multiple Choice",
+                question: "What is a ziggurat?",
+                options: [
+                    "A type of boat",
+                    "A farming tool",
+                    "A pyramid-shaped temple",
+                    "A system of writing"
+                ],
+                answer: 2
+            },
+            {
+                type: "Multiple Choice",
+                question: "Who created Hammurabi's Code?",
+                options: [
+                    "Sargon of Akkad",
+                    "King Hammurabi of Babylon",
+                    "Cyrus the Great",
+                    "Ur-Nammu"
+                ],
+                answer: 1
+            },
+            {
+                type: "Multiple Choice",
+                question: "What was the capital of the Assyrian empire under Ashurbanipal?",
+                options: [
+                    "Babylon",
+                    "Ur",
+                    "Nineveh",
+                    "Persepolis"
+                ],
+                answer: 2
+            },
+            {
+                type: "Multiple Choice",
+                question: "Who conquered Babylon in 539 BCE?",
+                options: [
+                    "Alexander the Great",
+                    "Cyrus the Great",
+                    "Darius",
+                    "Sargon"
+                ],
+                answer: 1
+            },
+            {
+                type: "Multiple Choice",
+                question: "What metal did Sumerians mix with tin to make bronze?",
+                options: [
+                    "Iron",
+                    "Gold",
+                    "Silver",
+                    "Copper"
+                ],
+                answer: 3
+            },
 
-        try {
-            firebase.initializeApp(firebaseConfig);
-            database = firebase.database();
-            firebaseEnabled = true;
-            console.log("Firebase connected successfully!");
-            
-            try {
-                mesoDb = firebase.firestore();
-                console.log("Firestore connected for quiz logging!");
-            } catch (e) {
-                console.warn("Firestore not available:", e);
+            // True/False Questions
+            {
+                type: "True/False",
+                question: "The Fertile Crescent had poor soil that made farming difficult.",
+                answer: false
+            },
+            {
+                type: "True/False",
+                question: "Sumerians invented the wheel.",
+                answer: true
+            },
+            {
+                type: "True/False",
+                question: "The Sumerians practiced monotheism (belief in one god).",
+                answer: false
+            },
+            {
+                type: "True/False",
+                question: "Hammurabi's Code established the rule of law.",
+                answer: true
+            },
+            {
+                type: "True/False",
+                question: "The Epic of Gilgamesh was written in cuneiform on clay tablets.",
+                answer: true
+            },
+            {
+                type: "True/False",
+                question: "Women in ancient Mesopotamia could never hold positions of power.",
+                answer: false
+            },
+            {
+                type: "True/False",
+                question: "The Assyrians were known for their powerful cavalry.",
+                answer: true
+            },
+            {
+                type: "True/False",
+                question: "Darius the Great divided the Persian empire into provinces called satrapies.",
+                answer: true
+            },
+
+            // Fill in the Blank Questions
+            {
+                type: "Fill in the Blank",
+                question: "_____ is the practice of supplying water to crops through canals and ditches.",
+                answer: "irrigation"
+            },
+            {
+                type: "Fill in the Blank",
+                question: "A _____ is an independent state that includes a city and its surrounding territory.",
+                answer: "city-state"
+            },
+            {
+                type: "Fill in the Blank",
+                question: "_____ is a trading system in which people exchange goods directly without using money.",
+                answer: "barter"
+            },
+            {
+                type: "Fill in the Blank",
+                question: "The belief in more than one god is called _____.",
+                answer: "polytheism"
+            },
+            {
+                type: "Fill in the Blank",
+                question: "A _____ is payment made to show loyalty to a stronger power.",
+                answer: "tribute"
+            },
+            {
+                type: "Fill in the Blank",
+                question: "The _____ were a force of 10,000 elite Persian soldiers.",
+                answer: "immortals"
+            },
+            {
+                type: "Fill in the Blank",
+                question: "_____ is money used as a medium of exchange, usually bills or coins.",
+                answer: "currency"
             }
-        } catch (error) {
-            console.warn("Firebase not configured. Running in single-player mode.");
-        }
-
-        // ===================================================================
-        // MESOPOTAMIA QUIZ SYSTEM
-        // ===================================================================
-        const MESO_QUESTIONS = [
-            { id: 1, text: "After Hammurabi's death, which northern Mesopotamian people later united the region again?", choices: { A: "Egyptians", B: "Assyrians", C: "Greeks", D: "Phoenicians" }, correct: "B" },
-            { id: 2, text: "What helped Assyria become a powerful military state?", choices: { A: "A huge navy", B: "Camels for desert travel", C: "Iron weapons and cavalry", D: "Stone city walls" }, correct: "C" },
-            { id: 3, text: "What is cavalry?", choices: { A: "Soldiers who fight on foot", B: "Soldiers who fight while riding horses", C: "Soldiers who guard temples", D: "Soldiers who control boats" }, correct: "B" },
-            { id: 4, text: "How did the Assyrians organize their huge empire?", choices: { A: "Each city ruled itself with no control", B: "They divided it into provinces with governors", C: "They had only one giant city", D: "They used democracy everywhere" }, correct: "B" },
-            { id: 5, text: "Which city did Ashurbanipal make his capital?", choices: { A: "Babylon", B: "Persepolis", C: "Nineveh", D: "Jerusalem" }, correct: "C" },
-            { id: 6, text: "What was special about Ashurbanipal's library at Nineveh?", choices: { A: "It stored only farming tools", B: "It held thousands of cuneiform tablets", C: "It was built underwater", D: "It was only for soldiers" }, correct: "B" },
-            { id: 7, text: "Nebuchadnezzar II was king of which empire?", choices: { A: "Old Babylonian", B: "Neo-Babylonian", C: "Egyptian", D: "Persian" }, correct: "B" },
-            { id: 8, text: "Which famous project is Nebuchadnezzar II best known for?", choices: { A: "The Great Pyramids", B: "The Great Wall", C: "The Hanging Gardens of Babylon", D: "The Lighthouse of Alexandria" }, correct: "C" },
-            { id: 9, text: "Cyrus the Great first won an empire by defeating which people?", choices: { A: "The Medes", B: "The Egyptians", C: "The Greeks", D: "The Romans" }, correct: "A" },
-            { id: 10, text: "What is a standing army?", choices: { A: "Soldiers who only fight in summer", B: "A permanent, professional army", C: "Farmers who fight when needed", D: "An army made only of nobles" }, correct: "B" },
-            { id: 11, text: "The Persian 'Immortals' were:", choices: { A: "A group of gods", B: "Elite soldiers in a 10,000-man unit", C: "A royal family", D: "A group of priests" }, correct: "B" },
-            { id: 12, text: "How did Cyrus treat conquered peoples like the Babylonians and Jews?", choices: { A: "Destroyed their temples", B: "Forced only Persian customs", C: "Allowed their religions and customs", D: "Made them leave their homelands" }, correct: "C" },
-            { id: 13, text: "Which Persian ruler expanded the empire and built the Great Royal Road?", choices: { A: "Sargon", B: "Nebuchadnezzar II", C: "Darius the Great", D: "Ashurbanipal" }, correct: "C" },
-            { id: 14, text: "What was tribute in the Persian empire?", choices: { A: "A type of coin", B: "Payment to show loyalty to a stronger power", C: "A law code", D: "A royal road" }, correct: "B" },
-            { id: 15, text: "How did Darius make trade easier across the Persian empire?", choices: { A: "Banned all foreign goods", B: "Forced everyone to barter", C: "Created a common currency of gold coins", D: "Closed the Great Royal Road" }, correct: "C" },
-            { id: 16, text: "What did the Great Royal Road connect?", choices: { A: "Rome and Athens", B: "Nineveh and Jerusalem", C: "Susa and Sardis (and other parts of the empire)", D: "Babylon and the Nile delta" }, correct: "C" },
-            { id: 17, text: "What is the main idea of Zoroastrianism?", choices: { A: "Thousands of equal gods", B: "Universe is a struggle between good and evil", C: "Ignore right and wrong", D: "Only kings reach the afterlife" }, correct: "B" },
-            { id: 18, text: "What is the name of the Zoroastrian sacred text?", choices: { A: "The Torah", B: "The Bible", C: "The Avesta", D: "The Epic of Gilgamesh" }, correct: "C" },
-            { id: 19, text: "How did Darius balance local self-government with central power?", choices: { A: "Ruled every village personally", B: "Banned all local traditions", C: "Provinces with local leaders under central control", D: "Let the army decide everything" }, correct: "C" },
-            { id: 20, text: "Why are the Assyrian and Persian empires important in Mesopotamian history?", choices: { A: "They ended writing and trade", B: "They united regions and spread new ideas", C: "They stayed small and isolated", D: "They used no armies at all" }, correct: "B" }
         ];
 
-        let mesoUsedIds = [];
-        let mesoOverlayVisible = false;
-        let mesoCurrentQuestion = null;
-        let quizInterval = null;
+        // Update player names
+        document.getElementById('player1Name').addEventListener('change', function() {
+            const name = this.value || 'Player 1';
+            document.getElementById('p1NameDisplay').textContent = name;
+            document.getElementById('p1ScoringTitle').textContent = name + ' Scoring';
+        });
 
-        function mesoPickQuestion() {
-            if (mesoUsedIds.length === MESO_QUESTIONS.length) {
-                mesoUsedIds = [];
-            }
-            const remaining = MESO_QUESTIONS.filter(q => !mesoUsedIds.includes(q.id));
-            const q = remaining[Math.floor(Math.random() * remaining.length)];
-            mesoUsedIds.push(q.id);
-            return q;
+        document.getElementById('player2Name').addEventListener('change', function() {
+            const name = this.value || 'Player 2';
+            document.getElementById('p2NameDisplay').textContent = name;
+            document.getElementById('p2ScoringTitle').textContent = name + ' Scoring';
+        });
+
+        function getRandomQuestion() {
+            currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+            displayQuestion(currentQuestion);
         }
 
-        function mesoLogAnswer(question, label, isCorrect) {
-            if (!mesoDb) return;
+        function displayQuestion(q) {
+            const display = document.getElementById('questionDisplay');
+            let html = `
+                <span class="question-type">${q.type}</span>
+                <div class="question-text">${q.question}</div>
+            `;
 
-            const record = {
-                name: playerName || "Anonymous",
-                game: "Cell Battle - Mesopotamia Edition",
-                topic: "Assyrian & Persian Empires (Lesson 2.3)",
-                room: currentRoom || "unknown",
-                questionId: question.id,
-                questionText: question.text,
-                correctChoice: question.correct,
-                chosenChoice: label,
-                correct: !!isCorrect,
-                massChange: isCorrect ? +10 : -10,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-
-            mesoDb.collection("mesopotamia_scores").add(record).catch(err => {
-                console.error("Error logging quiz answer:", err);
-            });
-        }
-
-        function mesoShowQuestion() {
-            if (mesoOverlayVisible || !gameStarted || !player) return;
-
-            const wasPlaying = gameStarted;
-            gameStarted = false;
-
-            const q = mesoPickQuestion();
-            mesoCurrentQuestion = q;
-
-            const overlay = document.createElement("div");
-            overlay.id = "mesoQuizOverlay";
-            Object.assign(overlay.style, {
-                position: "fixed",
-                inset: "0",
-                background: "rgba(0,0,0,0.85)",
-                display: "flex",
-                zIndex: "9999",
-                justifyContent: "center",
-                alignItems: "center",
-                fontFamily: "Arial, sans-serif"
-            });
-
-            const card = document.createElement("div");
-            Object.assign(card.style, {
-                background: "linear-gradient(135deg, #1e3a8a 0%, #312e81 100%)",
-                borderRadius: "20px",
-                padding: "30px",
-                maxWidth: "600px",
-                width: "90%",
-                color: "#ffffff",
-                boxShadow: "0 10px 40px rgba(0,0,0,0.6)",
-                border: "2px solid #60a5fa"
-            });
-
-            const title = document.createElement("h2");
-            title.textContent = "📜 Mesopotamia Knowledge Check";
-            title.style.marginBottom = "10px";
-            title.style.textAlign = "center";
-            title.style.fontSize = "24px";
-
-            const subtitle = document.createElement("div");
-            subtitle.textContent = "Topic 2 Lesson 3: Assyrian & Persian Empires";
-            subtitle.style.fontSize = "14px";
-            subtitle.style.color = "#93c5fd";
-            subtitle.style.textAlign = "center";
-            subtitle.style.marginBottom = "20px";
-
-            const questionEl = document.createElement("div");
-            questionEl.textContent = q.text;
-            questionEl.style.fontSize = "18px";
-            questionEl.style.margin = "20px 0";
-            questionEl.style.fontWeight = "500";
-            questionEl.style.lineHeight = "1.5";
-
-            const choicesEl = document.createElement("div");
-            choicesEl.style.marginTop = "20px";
-
-            const feedbackEl = document.createElement("div");
-            feedbackEl.style.marginTop = "15px";
-            feedbackEl.style.fontSize = "16px";
-            feedbackEl.style.textAlign = "center";
-            feedbackEl.style.fontWeight = "bold";
-
-            ["A", "B", "C", "D"].forEach(label => {
-                const btn = document.createElement("button");
-                btn.textContent = label + ". " + q.choices[label];
-                Object.assign(btn.style, {
-                    display: "block",
-                    width: "100%",
-                    margin: "10px 0",
-                    padding: "15px",
-                    fontSize: "16px",
-                    cursor: "pointer",
-                    borderRadius: "12px",
-                    border: "2px solid #60a5fa",
-                    background: "#1e40af",
-                    color: "#ffffff",
-                    textAlign: "left",
-                    transition: "all 0.2s",
-                    fontWeight: "500"
+            if (q.type === "Multiple Choice") {
+                html += '<div class="options">';
+                q.options.forEach((option, index) => {
+                    html += `<div class="option" onclick="checkAnswer(${index})">${option}</div>`;
                 });
-
-                btn.onmouseover = () => {
-                    btn.style.background = "#2563eb";
-                    btn.style.transform = "scale(1.02)";
-                };
-                btn.onmouseout = () => {
-                    btn.style.background = "#1e40af";
-                    btn.style.transform = "scale(1)";
-                };
-
-                btn.onclick = () => {
-                    const isCorrect = (label === q.correct);
-
-                    if (isCorrect) {
-                        player.mass += 10;
-                        feedbackEl.textContent = "✅ Correct! +10 Mass";
-                        feedbackEl.style.color = "#22c55e";
-                        speakText("Correct! You gained 10 mass!");
-                    } else {
-                        player.mass = Math.max(CONFIG.MIN_MASS, player.mass - 10);
-                        feedbackEl.textContent = `❌ Incorrect! -10 Mass. Answer: ${q.correct}. ${q.choices[q.correct]}`;
-                        feedbackEl.style.color = "#f87171";
-                        speakText("Incorrect. You lost 10 mass.");
-                    }
-
-                    if (player.mass > CONFIG.MAX_MASS) player.mass = CONFIG.MAX_MASS;
-
-                    mesoLogAnswer(q, label, isCorrect);
-
-                    // 3s immunity after answering
-                    player.immunityUntil = Date.now() + 3000;
-                    syncPlayerToFirebase();
-                    speakText("You are immune for three seconds!");
-
-                    const allButtons = choicesEl.querySelectorAll("button");
-                    allButtons.forEach(b => {
-                        b.disabled = true;
-                        b.style.opacity = "0.5";
-                        b.style.cursor = "not-allowed";
-                    });
-
-                    allButtons.forEach(b => {
-                        if (b.textContent.startsWith(q.correct + ".")) {
-                            b.style.background = "#22c55e";
-                            b.style.border = "2px solid #16a34a";
-                        }
-                    });
-
-                    setTimeout(() => {
-                        document.body.removeChild(overlay);
-                        mesoOverlayVisible = false;
-                        gameStarted = wasPlaying;
-                        if (wasPlaying) {
-                            lastUpdate = Date.now();
-                            gameLoop();
-                        }
-                    }, 3000);
-                };
-
-                choicesEl.appendChild(btn);
-            });
-
-            card.appendChild(title);
-            card.appendChild(subtitle);
-            card.appendChild(questionEl);
-            card.appendChild(choicesEl);
-            card.appendChild(feedbackEl);
-            overlay.appendChild(card);
-            document.body.appendChild(overlay);
-
-            mesoOverlayVisible = true;
-        }
-
-        // ===================================================================
-        // ACCESSIBILITY FEATURES (TTS ETC.)
-        // ===================================================================
-        let ttsEnabled = true;
-        let currentLanguage = 'en';
-        let speechRate = 1.0;
-
-        const translations = {
-            en: {
-                instructions: "Move your mouse or trackpad, or use the arrow keys / W A S D to control your cell. Eat food and smaller cells to grow. Press space to bank half your mass in safe zones. Leaderboard is based on banked points.",
-                gameStatus: "Your current mass is {mass}. Your banked score is {banked}. You are rank {rank} out of {total} players (by banked).",
-                leaderboard: "The top three players by banked score are: {leaders}",
-                eaten: "Oh no! You were eaten. Respawning...",
-                atePlayer: "Great job! You ate another player!",
-                split: "You banked half your mass!"
-            },
-            es: {
-                instructions: "Mueve el ratón o panel táctil, o usa las flechas / W A S D para controlar tu célula. Come comida y células más pequeñas para crecer. Pulsa espacio para guardar la mitad de tu masa en zonas seguras. La clasificación usa puntos guardados.",
-                gameStatus: "Tu masa actual es {mass}. Tu puntuación guardada es {banked}. Estás en el puesto {rank} de {total} jugadores (por puntos guardados).",
-                leaderboard: "Los tres mejores jugadores por puntos guardados son: {leaders}",
-                eaten: "¡Oh no! Te comieron. Reapareciendo...",
-                atePlayer: "¡Buen trabajo! ¡Comiste a otro jugador!",
-                split: "¡Guardaste la mitad de tu masa!"
-            },
-            fr: {
-                instructions: "Déplacez votre souris ou pavé tactile, ou utilisez les flèches / W A S D pour contrôler votre cellule. Mangez de la nourriture et des cellules plus petites pour grandir. Appuyez sur espace pour mettre en banque la moitié de votre masse dans les zones sûres. Le classement est basé sur les points en banque.",
-                gameStatus: "Votre masse actuelle est {mass}. Votre score en banque est {banked}. Vous êtes classé {rank} sur {total} joueurs (par points en banque).",
-                leaderboard: "Les trois meilleurs joueurs par points en banque sont : {leaders}",
-                eaten: "Oh non ! Vous avez été mangé. Réapparition...",
-                atePlayer: "Bon travail ! Vous avez mangé un autre joueur !",
-                split: "Vous avez mis en banque la moitié de votre masse !"
-            },
-            zh: {
-                instructions: "使用鼠标或触控板，或使用方向键 / W A S D 控制你的细胞。吃食物和更小的细胞来成长。在安全区按空格键可把一半质量存入银行。排行榜按存入分数排序。",
-                gameStatus: "你目前的质量是 {mass}。你存入的得分是 {banked}。在按存入分数排名的 {total} 名玩家中，你排第 {rank}。",
-                leaderboard: "按存入分数排名的前三名玩家是：{leaders}",
-                eaten: "哦不！你被吃掉了。正在重生……",
-                atePlayer: "干得好！你吃掉了另一个玩家！",
-                split: "你存入了一半的质量！"
-            },
-            ar: {
-                instructions: "حرك الماوس أو لوحة اللمس، أو استخدم الأسهم / W A S D للتحكم في خليتك. كل الطعام والخلايا الأصغر لتنمو. اضغط على المسافة في المناطق الآمنة لتخزين نصف كتلتك. لوحة الصدارة تعتمد على النقاط المخزنة.",
-                gameStatus: "كتلتك الحالية هي {mass}. نقاطك المخزنة هي {banked}. ترتيبك {rank} من {total} لاعب (حسب النقاط المخزنة).",
-                leaderboard: "أعلى ثلاثة لاعبين حسب النقاط المخزنة هم: {leaders}",
-                eaten: "يا لا! تم أكلك. إعادة الظهور...",
-                atePlayer: "عمل رائع! لقد أكلت لاعبًا آخر!",
-                split: "لقد خزنت نصف كتلتك!"
-            },
-            pt: {
-                instructions: "Mova o mouse ou trackpad, ou use as setas / W A S D para controlar sua célula. Coma comida e células menores para crescer. Pressione espaço nas zonas seguras para guardar metade da massa no banco. O placar é baseado no valor bancado.",
-                gameStatus: "Sua massa atual é {mass}. Seu valor bancado é {banked}. Você está em {rank}º de {total} jogadores (por valor bancado).",
-                leaderboard: "Os três melhores jogadores por valor bancado são: {leaders}",
-                eaten: "Oh não! Você foi comido. Reaparecendo...",
-                atePlayer: "Bom trabalho! Você comeu outro jogador!",
-                split: "Você bancou metade da sua massa!"
-            }
-        };
-
-        function speakText(text, interrupt = false) {
-            if (!ttsEnabled && !interrupt) return;
-            if ('speechSynthesis' in window) {
-                if (interrupt) {
-                    window.speechSynthesis.cancel();
-                }
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.rate = speechRate;
-                utterance.lang = getLanguageCode(currentLanguage);
-                window.speechSynthesis.speak(utterance);
-            }
-        }
-
-        function getLanguageCode(lang) {
-            const codes = {
-                'en': 'en-US',
-                'es': 'es-ES',
-                'fr': 'fr-FR',
-                'zh': 'zh-CN',
-                'ar': 'ar-SA',
-                'pt': 'pt-BR'
-            };
-            return codes[lang] || 'en-US';
-        }
-
-        function getTranslation(key, replacements = {}) {
-            let text = translations[currentLanguage][key] || translations['en'][key];
-            Object.keys(replacements).forEach(k => {
-                text = text.replace(`{${k}}`, replacements[k]);
-            });
-            return text;
-        }
-
-        function speakGameStatus() {
-            if (!player) return;
-            const allPlayers = [
-                { name: player.name, bankedScore: player.bankedScore },
-                ...Object.values(otherPlayers).map(p => ({ name: p.name, bankedScore: p.bankedScore || 0 }))
-            ].sort((a, b) => b.bankedScore - a.bankedScore);
-
-            const rank = allPlayers.findIndex(p => p.name === player.name) + 1;
-            const text = getTranslation('gameStatus', {
-                mass: Math.floor(player.mass),
-                banked: Math.floor(player.bankedScore),
-                rank: rank || '-',
-                total: allPlayers.length
-            });
-            speakText(text, true);
-        }
-
-        function speakLeaderboard() {
-            const allPlayers = [
-                { name: player.name, bankedScore: player.bankedScore },
-                ...Object.values(otherPlayers).map(p => ({ name: p.name, bankedScore: p.bankedScore || 0 }))
-            ].sort((a, b) => b.bankedScore - a.bankedScore).slice(0, 3);
-
-            const leaders = allPlayers.map((p, i) => `${i+1}. ${p.name} with ${Math.floor(p.bankedScore)} banked`).join(', ');
-            const text = getTranslation('leaderboard', { leaders });
-            speakText(text, true);
-        }
-
-        function toggleAccessibilityHelp() {
-            const helpText = getTranslation('instructions');
-            speakText(helpText, true);
-        }
-
-        document.getElementById('dyslexiaFont').addEventListener('change', (e) => {
-            document.body.classList.toggle('dyslexia-font', e.target.checked);
-            speakText('Easy-read font ' + (e.target.checked ? 'enabled' : 'disabled'));
-        });
-
-        document.getElementById('highContrast').addEventListener('change', (e) => {
-            document.body.classList.toggle('high-contrast', e.target.checked);
-            speakText('High contrast colors ' + (e.target.checked ? 'enabled' : 'disabled'));
-        });
-
-        document.getElementById('textToSpeech').addEventListener('change', (e) => {
-            ttsEnabled = e.target.checked;
-            speakText('Read aloud ' + (e.target.checked ? 'enabled' : 'disabled'), true);
-        });
-
-        document.getElementById('largerText').addEventListener('change', (e) => {
-            document.body.style.fontSize = e.target.checked ? '1.5em' : '1em';
-            speakText('Bigger text ' + (e.target.checked ? 'enabled' : 'disabled'));
-        });
-
-        document.getElementById('languageSelect').addEventListener('change', (e) => {
-            currentLanguage = e.target.value;
-            speakText('Language changed');
-        });
-
-        document.getElementById('speechRate').addEventListener('change', (e) => {
-            speechRate = parseFloat(e.target.value);
-            speakText('Voice speed changed');
-        });
-
-        document.getElementById('readInstructions').addEventListener('click', () => {
-            const helpText = getTranslation('instructions');
-            speakText(helpText, true);
-        });
-
-        // ===================================================================
-        // GAME CONFIGURATION
-        // ===================================================================
-        const CONFIG = {
-            WORLD_WIDTH: 3000,
-            WORLD_HEIGHT: 3000,
-            INITIAL_MASS: 10,
-            MAX_MASS: 670,
-            FOOD_MASS: 1,
-            MAX_FOOD: 300,
-            FOOD_SIZE: 5,
-            MIN_SPLIT_MASS: 20,
-            SPLIT_SPEED: 15,
-            SPEED_MULTIPLIER: 11,
-            MASS_LOSS_RATE: 0.002,
-            MIN_MASS: 10,
-            SAFE_ZONE_SIZE: 400,
-            SAFE_ZONE_TIME: 15000,
-        };
-
-        const SAFE_ZONES = [
-            { x: 200, y: 200, label: 'Top Left' },
-            { x: CONFIG.WORLD_WIDTH - 200, y: 200, label: 'Top Right' },
-            { x: 200, y: CONFIG.WORLD_HEIGHT - 200, label: 'Bottom Left' },
-            { x: CONFIG.WORLD_WIDTH - 200, y: CONFIG.WORLD_HEIGHT - 200, label: 'Bottom Right' }
-        ];
-
-        // ===================================================================
-        // GAME STATE
-        // ===================================================================
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const minimapCanvas = document.getElementById('minimap');
-        const minimapCtx = minimapCanvas.getContext('2d');
-
-        let gameStarted = false;
-        let playerId = null;
-        let playerName = '';
-        let currentRoom = 'room-a';
-        let player = null;
-        let otherPlayers = {};
-        let food = [];
-        let camera = { x: 0, y: 0 };
-        let mouse = { x: 0, y: 0 };
-        let lastUpdate = Date.now();
-        let lastMass = 0;
-        let inSafeZone = false;
-        let safeZoneEnterTime = 0;
-        let currentSafeZone = null;
-
-        const keys = {
-            ArrowUp: false,
-            ArrowDown: false,
-            ArrowLeft: false,
-            ArrowRight: false,
-            KeyW: false,
-            KeyA: false,
-            KeyS: false,
-            KeyD: false
-        };
-        const MOVE_KEYS = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyW','KeyA','KeyS','KeyD'];
-
-        // ===================================================================
-        // UTILITY FUNCTIONS
-        // ===================================================================
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-
-        function generateId() {
-            return 'player_' + Math.random().toString(36).substr(2, 9);
-        }
-
-        function randomColor() {
-            const colors = [
-                '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', 
-                '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2',
-                '#F8B739', '#52B788'
-            ];
-            return colors[Math.floor(Math.random() * colors.length)];
-        }
-
-        function getRandomPosition() {
-            return {
-                x: Math.random() * CONFIG.WORLD_WIDTH,
-                y: Math.random() * CONFIG.WORLD_HEIGHT
-            };
-        }
-
-        function distance(p1, p2) {
-            const dx = p1.x - p2.x;
-            const dy = p1.y - p2.y;
-            return Math.sqrt(dx * dx + dy * dy);
-        }
-
-        function checkCollision(cell1, cell2) {
-            const dist = distance(cell1, cell2);
-            return dist < (cell1.radius + cell2.radius);
-        }
-
-        function isInSafeZone(x, y) {
-            for (let zone of SAFE_ZONES) {
-                const dist = Math.sqrt((x - zone.x) ** 2 + (y - zone.y) ** 2);
-                if (dist < CONFIG.SAFE_ZONE_SIZE / 2) {
-                    return zone;
-                }
-            }
-            return null;
-        }
-
-        function checkSafeZoneStatus() {
-            const zone = isInSafeZone(player.x, player.y);
-            
-            if (zone && !inSafeZone) {
-                inSafeZone = true;
-                safeZoneEnterTime = Date.now();
-                currentSafeZone = zone;
-                speakText(`Entered safe zone! You have 15 seconds.`);
-            } else if (!zone && inSafeZone) {
-                inSafeZone = false;
-                currentSafeZone = null;
-            } else if (zone && inSafeZone) {
-                const timeInZone = Date.now() - safeZoneEnterTime;
-                if (timeInZone >= CONFIG.SAFE_ZONE_TIME) {
-                    ejectFromSafeZone(zone);
-                }
-            }
-        }
-
-        function ejectFromSafeZone(zone) {
-            const angle = Math.random() * Math.PI * 2;
-            const ejectDistance = CONFIG.SAFE_ZONE_SIZE / 2 + 100;
-            
-            player.x = zone.x + Math.cos(angle) * ejectDistance;
-            player.y = zone.y + Math.sin(angle) * ejectDistance;
-            
-            player.x = Math.max(player.radius, Math.min(CONFIG.WORLD_WIDTH - player.radius, player.x));
-            player.y = Math.max(player.radius, Math.min(CONFIG.WORLD_HEIGHT - player.radius, player.y));
-            
-            inSafeZone = false;
-            currentSafeZone = null;
-            speakText(`Time's up! Ejected from safe zone!`);
-        }
-
-        // ===================================================================
-        // CELL CLASS
-        // ===================================================================
-        class Cell {
-            constructor(x, y, mass, color, name = '') {
-                this.x = x;
-                this.y = y;
-                this.mass = mass;
-                this.color = color;
-                this.name = name;
-                this.vx = 0;
-                this.vy = 0;
-                this.bankedScore = 0;
-                this.immunityUntil = 0;
-            }
-
-            get radius() {
-                return Math.sqrt(this.mass) * 4.5;
-            }
-
-            get speed() {
-                const m = Math.max(this.mass, CONFIG.INITIAL_MASS);
-                const base = CONFIG.SPEED_MULTIPLIER / Math.pow(m, 0.38);
-                return base + 1.2;
-            }
-
-            drawGlowIfImmune(screenX, screenY) {
-                const now = Date.now();
-                if (this.immunityUntil && now < this.immunityUntil) {
-                    const pulse = 0.4 + 0.4 * Math.sin(now / 120);
-                    const r = this.radius + 10;
-                    ctx.save();
-                    ctx.strokeStyle = `rgba(255, 0, 0, ${0.6 + pulse / 2})`;
-                    ctx.lineWidth = 6;
-                    ctx.shadowColor = 'rgba(255,0,0,0.9)';
-                    ctx.shadowBlur = 20;
-                    ctx.beginPath();
-                    ctx.arc(screenX, screenY, r, 0, Math.PI * 2);
-                    ctx.stroke();
-                    ctx.restore();
-                }
-            }
-
-            move(targetX, targetY) {
-                const dx = targetX - this.x;
-                const dy = targetY - this.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-
-                if (dist > 10) {
-                    this.vx = (dx / dist) * this.speed;
-                    this.vy = (dy / dist) * this.speed;
-                    
-                    this.x += this.vx;
-                    this.y += this.vy;
-
-                    this.x = Math.max(this.radius, Math.min(CONFIG.WORLD_WIDTH - this.radius, this.x));
-                    this.y = Math.max(this.radius, Math.min(CONFIG.WORLD_HEIGHT - this.radius, this.y));
-                }
-
-                if (this.mass > CONFIG.MAX_MASS) {
-                    this.mass = CONFIG.MAX_MASS;
-                }
-
-                if (this.mass > CONFIG.MIN_MASS) {
-                    this.mass -= CONFIG.MASS_LOSS_RATE;
-                }
-            }
-
-            draw(ctx, camX, camY) {
-                const screenX = this.x - camX;
-                const screenY = this.y - camY;
-
-                this.drawGlowIfImmune(screenX, screenY);
-
-                if (this.inSafeZone) {
-                    const pulse = Math.sin(Date.now() / 300) * 0.2 + 0.8;
-                    ctx.strokeStyle = 'rgba(0, 255, 100, ' + pulse + ')';
-                    ctx.lineWidth = 5;
-                    ctx.beginPath();
-                    ctx.arc(screenX, screenY, this.radius + 10, 0, Math.PI * 2);
-                    ctx.stroke();
-                    
-                    ctx.fillStyle = 'rgba(0, 255, 100, ' + pulse + ')';
-                    ctx.font = '20px Arial';
-                    ctx.fillText('🛡️', screenX + this.radius - 10, screenY - this.radius + 10);
-                }
-
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.arc(screenX, screenY, this.radius, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-                ctx.lineWidth = 3;
-                ctx.stroke();
-
-                if (this.name) {
-                    ctx.fillStyle = 'white';
-                    ctx.font = 'bold 16px Arial';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText(this.name, screenX, screenY - 5);
-                    ctx.font = '14px Arial';
-                    ctx.fillText(Math.floor(this.mass), screenX, screenY + 15);
-                }
-            }
-
-            canEat(otherCell) {
-                return this.mass > otherCell.mass * 1.2;
-            }
-
-            eat(otherCell) {
-                this.mass += otherCell.mass;
-                if (this.mass > CONFIG.MAX_MASS) {
-                    this.mass = CONFIG.MAX_MASS;
-                }
-            }
-
-            split() {
-                if (this.mass < CONFIG.MIN_SPLIT_MASS) return null;
-                
-                const bankAmount = Math.floor(this.mass / 2);
-                this.mass -= bankAmount;
-                this.bankedScore += bankAmount;
-                
-                const notification = document.createElement('div');
-                notification.style.cssText = `
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background: rgba(255, 215, 0, 0.95);
-                    color: #000;
-                    padding: 30px 50px;
-                    border-radius: 20px;
-                    font-size: 2em;
-                    font-weight: bold;
-                    z-index: 10000;
-                    animation: popIn 0.5s;
+                html += '</div>';
+            } else if (q.type === "True/False") {
+                html += `
+                    <div class="options">
+                        <div class="option" onclick="checkAnswer(true)">True</div>
+                        <div class="option" onclick="checkAnswer(false)">False</div>
+                    </div>
                 `;
-                notification.textContent = `+${bankAmount} BANKED! 💰`;
-                document.body.appendChild(notification);
-                
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 1500);
-                
-                return null;
+            } else if (q.type === "Fill in the Blank") {
+                html += `
+                    <input type="text" class="fill-blank-input" id="fillBlankAnswer" placeholder="Type your answer here...">
+                    <div class="options">
+                        <div class="option" onclick="checkFillBlank()" style="background: #8B4513; color: white; text-align: center;">Submit Answer</div>
+                    </div>
+                `;
             }
+
+            html += '<div class="answer-display" id="answerDisplay"></div>';
+            display.innerHTML = html;
+            display.classList.add('active');
         }
 
-        // ===================================================================
-        // FOOD & FIREBASE SYNC
-        // ===================================================================
-        function generateFood() {
-            while (food.length < CONFIG.MAX_FOOD) {
-                const pos = getRandomPosition();
-                food.push({
-                    id: 'food_' + Date.now() + '_' + Math.random(),
-                    x: pos.x, y: pos.y,
-                    radius: CONFIG.FOOD_SIZE,
-                    mass: CONFIG.FOOD_MASS,
-                    color: randomColor()
-                });
+        function checkAnswer(selected) {
+            const answerDisplay = document.getElementById('answerDisplay');
+            const isCorrect = selected === currentQuestion.answer;
+            
+            answerDisplay.className = 'answer-display ' + (isCorrect ? 'correct' : 'incorrect');
+            answerDisplay.textContent = isCorrect ? 
+                '✓ CORRECT! Award points using the buttons above!' : 
+                `✗ INCORRECT. The correct answer is: ${currentQuestion.type === "Multiple Choice" ? currentQuestion.options[currentQuestion.answer] : currentQuestion.answer}`;
+        }
+
+        function checkFillBlank() {
+            const userAnswer = document.getElementById('fillBlankAnswer').value.trim().toLowerCase();
+            const correctAnswer = currentQuestion.answer.toLowerCase();
+            const isCorrect = userAnswer === correctAnswer;
+            
+            const answerDisplay = document.getElementById('answerDisplay');
+            answerDisplay.className = 'answer-display ' + (isCorrect ? 'correct' : 'incorrect');
+            answerDisplay.textContent = isCorrect ? 
+                '✓ CORRECT! Award points using the buttons above!' : 
+                `✗ INCORRECT. The correct answer is: ${currentQuestion.answer}`;
+        }
+
+        function scorePoints(player, points) {
+            if (player === 1) {
+                player1Score += points;
+                document.getElementById('player1Score').textContent = player1Score;
+            } else {
+                player2Score += points;
+                document.getElementById('player2Score').textContent = player2Score;
             }
-        }
 
-        function drawFood() {
-            food.forEach(f => {
-                const screenX = f.x - camera.x;
-                const screenY = f.y - camera.y;
-                if (screenX > -50 && screenX < canvas.width + 50 &&
-                    screenY > -50 && screenY < canvas.height + 50) {
-                    ctx.fillStyle = f.color;
-                    ctx.beginPath();
-                    ctx.arc(screenX, screenY, f.radius, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            });
-        }
-
-        function syncPlayerToFirebase() {
-            if (!firebaseEnabled || !player) return;
-
-            database.ref('rooms/' + currentRoom + '/players/' + playerId).set({
-                id: playerId,
-                name: player.name,
-                x: player.x,
-                y: player.y,
-                mass: player.mass,
-                bankedScore: player.bankedScore,
-                color: player.color,
-                inSafeZone: inSafeZone,
-                immunityUntil: player.immunityUntil || 0,
-                lastUpdate: Date.now()
-            });
-        }
-
-        function sendPlayerDeath(victimId) {
-            if (!firebaseEnabled) return;
-            database.ref('rooms/' + currentRoom + '/deaths/' + victimId).set({
-                killedBy: playerId,
-                killerName: player.name,
-                timestamp: Date.now()
-            });
+            // Visual feedback
+            const scoreElement = document.getElementById(player === 1 ? 'player1Score' : 'player2Score');
+            scoreElement.style.transform = 'scale(1.3)';
+            scoreElement.style.color = '#ffe66d';
             setTimeout(() => {
-                database.ref('rooms/' + currentRoom + '/deaths/' + victimId).remove();
-            }, 1000);
+                scoreElement.style.transform = 'scale(1)';
+                scoreElement.style.color = 'white';
+            }, 300);
         }
 
-        function listenForDeath() {
-            if (!firebaseEnabled || !playerId) return;
-            database.ref('rooms/' + currentRoom + '/deaths/' + playerId).on('value', (snapshot) => {
-                const deathData = snapshot.val();
-                if (deathData && gameStarted) {
-                    speakText(`Oh no! ${deathData.killerName} ate you!`);
-                    respawnPlayer();
-                }
-            });
-        }
-
-        function listenToOtherPlayers() {
-            if (!firebaseEnabled) return;
-            database.ref('rooms/' + currentRoom + '/players').on('value', (snapshot) => {
-                const players = snapshot.val();
-                otherPlayers = {};
-                if (players) {
-                    Object.keys(players).forEach(id => {
-                        if (id !== playerId) {
-                            const p = players[id];
-                            if (Date.now() - p.lastUpdate < 10000) {
-                                const cell = new Cell(p.x, p.y, p.mass, p.color, p.name);
-                                cell.inSafeZone = p.inSafeZone || false;
-                                cell.bankedScore = p.bankedScore || 0;
-                                cell.immunityUntil = p.immunityUntil || 0;
-                                otherPlayers[id] = cell;
-                            }
-                        }
-                    });
-                }
-                updatePlayerCount();
-            });
-        }
-
-        function removePlayerFromFirebase() {
-            if (!firebaseEnabled || !playerId) return;
-            database.ref('rooms/' + currentRoom + '/players/' + playerId).remove();
-        }
-
-        function checkCollisions() {
-            const beforeMass = player.mass;
-            const now = Date.now();
-            
-            food = food.filter(f => {
-                if (checkCollision(player, f)) {
-                    player.eat(f);
-                    return false;
-                }
-                return true;
-            });
-
-            Object.keys(otherPlayers).forEach(id => {
-                const other = otherPlayers[id];
-                
-                const playerInSafe = inSafeZone;
-                const otherInSafe = other.inSafeZone || false;
-                const playerImmune = player.immunityUntil && now < player.immunityUntil;
-                const otherImmune = other.immunityUntil && now < other.immunityUntil;
-
-                if (playerInSafe || otherInSafe || playerImmune || otherImmune) {
-                    return;
-                }
-                
-                if (checkCollision(player, other)) {
-                    if (player.canEat(other)) {
-                        player.eat(other);
-                        sendPlayerDeath(id);
-                        speakText(getTranslation('atePlayer'));
-                    } else if (other.canEat(player)) {
-                        // handled by death listener
-                    }
-                }
-            });
-
-            if (player.mass > CONFIG.MAX_MASS) player.mass = CONFIG.MAX_MASS;
-
-            if (player.mass > beforeMass + 10) {
-                if (Math.floor(player.mass / 20) > Math.floor(lastMass / 20)) {
-                    speakText(`You reached ${Math.floor(player.mass / 20) * 20} mass!`);
-                }
+        function resetGame() {
+            if (confirm('Are you sure you want to reset the game?')) {
+                player1Score = 0;
+                player2Score = 0;
+                document.getElementById('player1Score').textContent = '0';
+                document.getElementById('player2Score').textContent = '0';
+                document.getElementById('questionDisplay').classList.remove('active');
             }
-            lastMass = player.mass;
-
-            generateFood();
-        }
-
-        function updateCamera() {
-            camera.x = player.x - canvas.width / 2;
-            camera.y = player.y - canvas.height / 2;
-            camera.x = Math.max(0, Math.min(CONFIG.WORLD_WIDTH - canvas.width, camera.x));
-            camera.y = Math.max(0, Math.min(CONFIG.WORLD_HEIGHT - canvas.height, camera.y));
-        }
-
-        function drawGrid() {
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-            ctx.lineWidth = 1;
-            const startX = Math.floor(camera.x / 50) * 50;
-            const startY = Math.floor(camera.y / 50) * 50;
-            for (let x = startX; x < camera.x + canvas.width; x += 50) {
-                ctx.beginPath();
-                ctx.moveTo(x - camera.x, 0);
-                ctx.lineTo(x - camera.x, canvas.height);
-                ctx.stroke();
-            }
-            for (let y = startY; y < camera.y + canvas.height; y += 50) {
-                ctx.beginPath();
-                ctx.moveTo(0, y - camera.y);
-                ctx.lineTo(canvas.width, y - camera.y);
-                ctx.stroke();
-            }
-        }
-
-        function drawWorldBorder() {
-            ctx.strokeStyle = '#ff4444';
-            ctx.lineWidth = 10;
-            ctx.strokeRect(-camera.x, -camera.y, CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT);
-        }
-
-        function drawSafeZones() {
-            SAFE_ZONES.forEach(zone => {
-                const screenX = zone.x - camera.x;
-                const screenY = zone.y - camera.y;
-                const radius = CONFIG.SAFE_ZONE_SIZE / 2;
-
-                const pulse = Math.sin(Date.now() / 500) * 0.1 + 0.9;
-                
-                ctx.fillStyle = 'rgba(0, 255, 100, ' + (0.1 * pulse) + ')';
-                ctx.beginPath();
-                ctx.arc(screenX, screenY, radius, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.strokeStyle = 'rgba(0, 255, 100, ' + (0.5 * pulse) + ')';
-                ctx.lineWidth = 3;
-                ctx.stroke();
-
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-                ctx.font = 'bold 20px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('🛡️ SAFE ZONE', screenX, screenY - 10);
-                ctx.font = '14px Arial';
-                ctx.fillText('15 sec max', screenX, screenY + 10);
-            });
-
-            if (inSafeZone && currentSafeZone) {
-                const timeInZone = Date.now() - safeZoneEnterTime;
-                const timeLeft = Math.max(0, CONFIG.SAFE_ZONE_TIME - timeInZone);
-                const secondsLeft = Math.ceil(timeLeft / 1000);
-                
-                const screenX = player.x - camera.x;
-                const screenY = player.y - camera.y - player.radius - 30;
-                
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-                ctx.fillRect(screenX - 50, screenY - 15, 100, 30);
-                
-                const warningColor = secondsLeft <= 5 ? '#ff4444' : '#00ff64';
-                ctx.fillStyle = warningColor;
-                ctx.font = 'bold 18px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText(`⏱️ ${secondsLeft}s`, screenX, screenY + 5);
-                
-                if (secondsLeft <= 3 && Math.floor(Date.now() / 250) % 2 === 0) {
-                    ctx.fillStyle = 'rgba(255, 68, 68, 0.3)';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                }
-            }
-        }
-
-        function drawMinimap() {
-            const scale = 150 / CONFIG.WORLD_WIDTH;
-            minimapCtx.clearRect(0, 0, 150, 150);
-            minimapCtx.strokeStyle = '#667eea';
-            minimapCtx.strokeRect(0, 0, 150, 150);
-            minimapCtx.fillStyle = player.color;
-            minimapCtx.fillRect(player.x * scale - 2, player.y * scale - 2, 4, 4);
-            Object.values(otherPlayers).forEach(p => {
-                minimapCtx.fillStyle = p.color;
-                minimapCtx.fillRect(p.x * scale - 1, p.y * scale - 1, 2, 2);
-            });
-        }
-
-        function updateStats() {
-            document.getElementById('playerMass').textContent = Math.floor(player.mass);
-            document.getElementById('bankedScore').textContent = Math.floor(player.bankedScore);
-            const totalScore = Math.floor(player.bankedScore);
-            document.getElementById('totalScore').textContent = totalScore;
-            
-            const allPlayers = [
-                { name: player.name, bankedScore: player.bankedScore },
-                ...Object.values(otherPlayers).map(p => ({ 
-                    name: p.name, 
-                    bankedScore: p.bankedScore || 0
-                }))
-            ].sort((a, b) => b.bankedScore - a.bankedScore);
-            const rank = allPlayers.findIndex(p => p.name === player.name) + 1;
-            document.getElementById('playerRank').textContent = rank ? `#${rank}` : '-';
-        }
-
-        function updatePlayerCount() {
-            const count = 1 + Object.keys(otherPlayers).length;
-            document.getElementById('playerCount').textContent = count;
-        }
-
-        function updateLeaderboard() {
-            const allPlayers = [
-                { 
-                    name: player.name,
-                    mass: player.mass,
-                    bankedScore: player.bankedScore,
-                    isMe: true 
-                },
-                ...Object.values(otherPlayers).map(p => ({ 
-                    name: p.name, 
-                    mass: p.mass,
-                    bankedScore: p.bankedScore || 0,
-                    isMe: false 
-                }))
-            ].sort((a, b) => (b.bankedScore || 0) - (a.bankedScore || 0)).slice(0, 10);
-
-            const leaderboardHtml = allPlayers.map((p, i) => {
-                const className = p.isMe ? 'leaderboard-entry current-player' : 'leaderboard-entry';
-                return `<div class="${className}">
-                    <span>${i + 1}. ${p.name}</span>
-                    <span style="display: flex; gap: 8px; align-items: center;">
-                        <span style="color: #4CAF50;">${Math.floor(p.mass)}</span>
-                        <span style="color: #FFD700;">💰${Math.floor(p.bankedScore || 0)}</span>
-                    </span>
-                </div>`;
-            }).join('');
-            document.getElementById('leaderboardList').innerHTML = leaderboardHtml;
-        }
-
-        function gameLoop() {
-            if (!gameStarted) return;
-            const now = Date.now();
-            lastUpdate = now;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            drawGrid();
-            drawWorldBorder();
-            drawSafeZones();
-
-            let targetX = mouse.x + camera.x;
-            let targetY = mouse.y + camera.y;
-
-            const up = keys.ArrowUp || keys.KeyW;
-            const down = keys.ArrowDown || keys.KeyS;
-            const left = keys.ArrowLeft || keys.KeyA;
-            const right = keys.ArrowRight || keys.KeyD;
-
-            if (up || down || left || right) {
-                let dx = 0, dy = 0;
-                if (up) dy -= 1;
-                if (down) dy += 1;
-                if (left) dx -= 1;
-                if (right) dx += 1;
-                const len = Math.hypot(dx, dy);
-                if (len > 0) {
-                    dx /= len;
-                    dy /= len;
-                    targetX = player.x + dx * 1000;
-                    targetY = player.y + dy * 1000;
-                }
-            }
-
-            player.move(targetX, targetY);
-            checkSafeZoneStatus();
-            checkCollisions();
-            updateCamera();
-            drawFood();
-            Object.values(otherPlayers).forEach(p => p.draw(ctx, camera.x, camera.y));
-            player.draw(ctx, camera.x, camera.y);
-            updateStats();
-            updateLeaderboard();
-            drawMinimap();
-
-            if (now % 100 < 16) {
-                syncPlayerToFirebase();
-            }
-            requestAnimationFrame(gameLoop);
-        }
-
-        function updateRoomCounts() {
-            if (!firebaseEnabled) return;
-            const rooms = ['room-a', 'room-b', 'room-c', 'room-d'];
-            rooms.forEach(room => {
-                database.ref('rooms/' + room + '/players').once('value', (snapshot) => {
-                    const players = snapshot.val();
-                    let count = 0;
-                    if (players) {
-                        Object.keys(players).forEach(id => {
-                            const p = players[id];
-                            if (Date.now() - p.lastUpdate < 10000) {
-                                count++;
-                            }
-                        });
-                    }
-                    const roomLetter = room.split('-')[1].toUpperCase();
-                    const option = document.querySelector(`#roomSelect option[value="${room}"]`);
-                    if (option) {
-                        const emoji = option.textContent.split(' ')[0];
-                        option.textContent = `${emoji} Room ${roomLetter} (Players: ${count})`;
-                    }
-                });
-            });
-        }
-
-        function getRandomSafeZonePosition() {
-            const zone = SAFE_ZONES[Math.floor(Math.random() * SAFE_ZONES.length)];
-            const angle = Math.random() * Math.PI * 2;
-            const distance = Math.random() * 50;
-            return {
-                x: zone.x + Math.cos(angle) * distance,
-                y: zone.y + Math.sin(angle) * distance
-            };
-        }
-
-        function startGame() {
-            playerName = document.getElementById('playerName').value.trim();
-            if (!playerName) {
-                alert('Please enter your name!');
-                speakText('Please enter your name!', true);
-                return;
-            }
-
-            currentRoom = document.getElementById('roomSelect').value;
-            const roomLetter = currentRoom.split('-')[1].toUpperCase();
-            
-            playerId = generateId();
-            const startPos = getRandomSafeZonePosition();
-            player = new Cell(startPos.x, startPos.y, CONFIG.INITIAL_MASS, randomColor(), playerName);
-            lastMass = player.mass;
-
-            document.getElementById('startMenu').classList.add('hidden');
-            document.getElementById('stats').classList.remove('hidden');
-            document.getElementById('leaderboard').classList.remove('hidden');
-            document.getElementById('minimap').classList.remove('hidden');
-            document.getElementById('gameAccessibility').classList.remove('hidden');
-
-            generateFood();
-            if (firebaseEnabled) {
-                listenToOtherPlayers();
-                listenForDeath();
-                syncPlayerToFirebase();
-            }
-
-            gameStarted = true;
-            lastUpdate = Date.now();
-            
-            if (quizInterval) clearInterval(quizInterval);
-            quizInterval = setInterval(() => {
-                if (gameStarted && !mesoOverlayVisible) {
-                    mesoShowQuestion();
-                }
-            }, 40000);
-            
-            const welcomeText = getTranslation('instructions');
-            speakText(`Welcome ${playerName} to Room ${roomLetter}! You start in a safe zone. Answer Mesopotamia questions every 40 seconds to grow! ${welcomeText}`);
-            
-            gameLoop();
-        }
-
-        function respawnPlayer() {
-            const startPos = getRandomSafeZonePosition();
-            player.x = startPos.x;
-            player.y = startPos.y;
-            player.mass = CONFIG.INITIAL_MASS;
-            lastMass = player.mass;
-            inSafeZone = false;
-            safeZoneEnterTime = 0;
-            currentSafeZone = null;
-        }
-
-        // ===================================================================
-        // INPUT HANDLERS
-        // ===================================================================
-        window.addEventListener('resize', resizeCanvas);
-        canvas.addEventListener('mousemove', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            mouse.x = e.clientX - rect.left;
-            mouse.y = e.clientY - rect.top;
-        });
-        canvas.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            const rect = canvas.getBoundingClientRect();
-            const touch = e.touches[0];
-            mouse.x = touch.clientX - rect.left;
-            mouse.y = touch.clientY - rect.top;
-        });
-
-        document.addEventListener('keydown', (e) => {
-            const tag = e.target.tagName;
-            if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) {
-                return; // allow typing in name box
-            }
-
-            if (e.code === 'Space' && gameStarted) {
-                e.preventDefault();
-                player.split();
-                speakText(getTranslation('split'));
-            }
-
-            if (MOVE_KEYS.includes(e.code)) {
-                e.preventDefault();
-                keys[e.code] = true;
-            }
-        });
-
-        document.addEventListener('keyup', (e) => {
-            const tag = e.target.tagName;
-            if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) {
-                return;
-            }
-            if (MOVE_KEYS.includes(e.code)) {
-                e.preventDefault();
-                keys[e.code] = false;
-            }
-        });
-
-        document.getElementById('startButton').addEventListener('click', startGame);
-        document.getElementById('playerName').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') startGame();
-        });
-
-        window.addEventListener('beforeunload', () => {
-            removePlayerFromFirebase();
-        });
-
-        // INITIALIZE
-        resizeCanvas();
-        console.log('Cell Battle - Multiplayer Edition');
-        console.log('Firebase Status:', firebaseEnabled ? 'Connected ✓' : 'Not configured ⚠️');
-        
-        if (firebaseEnabled) {
-            updateRoomCounts();
-            setInterval(() => {
-                if (!gameStarted) {
-                    updateRoomCounts();
-                }
-            }, 3000);
         }
     </script>
 </body>
